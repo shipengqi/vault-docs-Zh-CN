@@ -1,7 +1,5 @@
 # Getting Started
 
-vault 是一个开源的，强大的密码管理工具。
-
 ## 安装
 
 [下载地址](https://www.vaultproject.io/downloads.html)。
