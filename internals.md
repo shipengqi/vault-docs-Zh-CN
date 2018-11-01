@@ -23,4 +23,17 @@ secrets 总是有租约的。这意味着客户端不能假定 secrets 内容可
 和 secret 租约撤销之间的交互。拥有基于服务器的体系结构可以将客户端从安全密钥和策略中分离出来，支持集中审计日志记录，并简化操作管理。
 
 ### 高级概述
+这是一个高级的概述，像下面这样：
+
 ![Architecture](imgs/layers.png)
+
+让我们开始分解这幅图。Barrier 内外的组件有明显的分离。只有存储后端和 HTTP API 在外部，所有其他组件都在 Barrier 内。
+
+存储后端是被不受 Vault 信任的，只是用于持久存储加密数据。当 Vault 服务器启动时，必须为它提供一个存储后端，以便数据在重启时可用。
+同样，必须由Vault服务器在启动时启动HTTP API，以便客户端可以与其进行交互。
+
+一旦启动，Vault 就处于密封状态。 在 Vault 上执行任何操作之前，必须将其解封。这是通过提供`unseal keys`来完成的。当Vault初始化时，它会生成一个`encryption key`，
+用于保护所有数据。 该密钥由`master key`保护。默认情况下，Vault使用一种被称为[Shamir's secret sharing algorithm](https://en.wikipedia.org/wiki/Shamir's_Secret_Sharing)
+的技术，将主密钥分成 5 个共享，重构主密钥需要任意 3 个共享。
+
+![Architecture](imgs/vault-shamir-secret-sharing.svg)
