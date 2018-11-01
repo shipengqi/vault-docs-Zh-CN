@@ -36,7 +36,7 @@ secrets 总是有租约的。这意味着客户端不能假定 secrets 内容可
 用于保护所有数据。 该密钥由`master key`保护。默认情况下，Vault使用一种被称为[Shamir's secret sharing algorithm](https://en.wikipedia.org/wiki/Shamir's_Secret_Sharing)
 的技术，将主密钥分成 5 个共享，重构主密钥需要任意 3 个共享。
 
-![Architecture](imgs/vault-shamir-secret-sharing.svg)
+![Shamir](imgs/vault-shamir-secret-sharing.svg)
 
 份额数和所需的最小阈值都可以指定。 Shamir的技术可以被禁用，主密钥可以直接用于开封。一旦 Vault 检索到加密密钥，它就能够解密存储后端中的数据，并进入未密封状态。
 一旦启封，Vault将加载所有已配置的审计设备，auth方法和 secrets 引擎。

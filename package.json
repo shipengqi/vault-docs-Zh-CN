@@ -1,0 +1,27 @@
+{
+  "name": "vault-docs-zh-cn",
+  "version": "1.0.0",
+  "description": "vault docs",
+  "main": "index.js",
+  "scripts": {
+    "docs:dev": "vuepress dev .",
+    "docs:build": "vuepress build .",
+    "deploy": "./build/deploy.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shipengqi/vault-docs-Zh-CN.git"
+  },
+  "keywords": [
+    "vault"
+  ],
+  "author": "shipengqi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/shipengqi/vault-docs-Zh-CN/issues"
+  },
+  "homepage": "https://github.com/shipengqi/vault-docs-Zh-CN#readme",
+  "devDependencies": {
+    "vuepress": "^0.14.2"
+  }
+}
