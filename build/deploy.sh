@@ -4,7 +4,7 @@ set -e
 
 npm run docs:build
 
-cd .vuepress/dist
+cd docs/.vuepress/dist
 
 # 如果是发布到自定义域名
 # echo 'www.example.com' > CNAME

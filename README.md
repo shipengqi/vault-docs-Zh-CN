@@ -9,7 +9,7 @@
 
 水平有限，仅用作日常工作参考，有能力的同学请查看[官方文档](https://www.vaultproject.io/)。
 
-欢迎提 [issue](https://github.com/shipengqi/vault-docs-Zh-CN/issues)、`star`，中文文档在[这里](https://github.com/shipengqi/vault-docs-Zh-CN)。
+欢迎提 [issue](https://github.com/shipengqi/vault-docs-Zh-CN/issues)、`star`，中文文档在[这里](https://shipengqi.github.io/vault-docs-Zh-CN)。
 
 
 欢迎来到 HashiCorp Vault 介绍指南!本指南是开始使用 Vault 的最佳地点。本指南涵盖了Vault 是什么，它可以解决什么问题，它如何与现有软件进行比较，
@@ -33,4 +33,4 @@ Vault 将根据需要生成具有有效权限的AWS密钥对。在创建了这�
 或特定类型的所有 secrets。
 
 
-查看[HashiCorp Vault 中文文档](https://github.com/shipengqi/vault-docs-Zh-CN)。
+查看[HashiCorp Vault 中文文档](https://shipengqi.github.io/vault-docs-Zh-CN)。
