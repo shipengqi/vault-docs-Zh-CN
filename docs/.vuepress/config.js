@@ -21,21 +21,24 @@ module.exports = {
     editLinkText: '错别字纠正',
     sidebarDepth: 3,
     nav: [{
-      text: 'Vault 入门',
+      text: '入门指南',
       link: '/guide/',
     },{
-      text: 'Vault 文档',
+      text: '文档',
       link: '/document/',
+    },{
+      text: 'API',
+      link: '/api/',
     }],
     sidebar: {
       '/guide/': [{
-        title: 'Vault 入门',
+        title: '入门指南',
         children: [
           ''
         ]
       }],
       '/document/': [{
-        title: 'Vault 文档（持续更新中...）',
+        title: '文档（持续更新中...）',
         children: [
           '',
           'installing',
@@ -46,6 +49,12 @@ module.exports = {
           'vault-agent',
           'secrets-engines',
           'auth-methods'
+        ]
+      }],
+      '/api/': [{
+        title: 'API',
+        children: [
+          ''
         ]
       }]
     }
