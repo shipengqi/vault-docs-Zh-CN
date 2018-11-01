@@ -22,22 +22,30 @@ module.exports = {
     sidebarDepth: 3,
     nav: [{
       text: 'Vault 入门',
-      link: '/getting-started',
+      link: '/guide/',
     },{
       text: 'Vault 文档',
-      link: '/installing',
+      link: '/document/',
     }],
     sidebar: {
-      '/getting-started': [{
-        title: 'Vault 入门（持续更新中...）',
+      '/guide/': [{
+        title: 'Vault 入门',
         children: [
           ''
         ]
       }],
-      '/installing': [{
+      '/document/': [{
         title: 'Vault 文档（持续更新中...）',
         children: [
-          ''
+          '',
+          'installing',
+          'internals',
+          'concepts',
+          'configuration',
+          'cli',
+          'vault-agent',
+          'secrets-engines',
+          'auth-methods'
         ]
       }]
     }

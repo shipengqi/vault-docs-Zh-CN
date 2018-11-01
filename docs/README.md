@@ -2,7 +2,7 @@
 home: true
 heroImage: /logo.png
 actionText: 开始阅读
-actionLink: /getting-started/
+actionLink: /guide/
 features:
 - title: Vault 入门
   details: 通过HashiCorp Vault了解 secrets 管理和数据保护。

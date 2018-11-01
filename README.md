@@ -1,8 +1,8 @@
 <h1 align="center">
-  HashiCorp Vault 文档的中文版本
+  HashiCorp Vault 中文文档
 </h1>
 <p align="center">
-  <img alt="HashiCorp Vault" src="docs/imgs/logo.png" width="20%" height="">
+  <img alt="HashiCorp Vault" src="docs/imgs/logo.png" width="50%" height="">
 </p>
 
 翻译自[官方文档](https://www.vaultproject.io/)，持续更新中。
@@ -11,7 +11,6 @@
 
 欢迎提 [issue](https://github.com/shipengqi/vault-docs-Zh-CN/issues)、`star`，中文文档在[这里](https://github.com/shipengqi/vault-docs-Zh-CN)。
 
-HashiCorp Vault 中文文档
 
 欢迎来到 HashiCorp Vault 介绍指南!本指南是开始使用 Vault 的最佳地点。本指南涵盖了Vault 是什么，它可以解决什么问题，它如何与现有软件进行比较，
 并包含了使用 Vault 的快速入门。
