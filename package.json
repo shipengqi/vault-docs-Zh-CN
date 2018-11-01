@@ -4,8 +4,8 @@
   "description": "vault docs",
   "main": "index.js",
   "scripts": {
-    "docs:dev": "vuepress dev .",
-    "docs:build": "vuepress build .",
+    "docs:dev": "vuepress dev ./docs",
+    "docs:build": "vuepress build ./docs",
     "deploy": "./build/deploy.sh"
   },
   "repository": {
