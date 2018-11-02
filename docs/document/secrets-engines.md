@@ -64,9 +64,24 @@ Success! Data written to: pki/roles/my-role
 
 配置好 secrets 引擎并且用户或者计算机有了一个一定权限的`Vault token`，就可以生成凭据。
 
-1. 
+1. 通过写入`/issue`端点，并带上`role name`，来生成新凭据：
+```bash
+$ vault write pki/issue/my-role \
+    common_name=www.my-website.com
+
+Key                 Value
+---                 -----
+certificate         -----BEGIN CERTIFICATE-----...
+issuing_ca          -----BEGIN CERTIFICATE-----...
+private_key         -----BEGIN RSA PRIVATE KEY-----...
+private_key_type    rsa
+serial_number       1d:2e:c6:06:45:18:60:0e:23:d6:c5:17:43:c0:fe:46:ed:d1:50:be
+```
+
+输出中会包含一个动态生成的私钥和证书，它对应了给定的`role`，并在 72h 到期（由我们的`role`定义决定）。为了简化自动化，还会返回`issuing_ca`和信任链。
 
 ### Considerations
+
 #### Be Careful with Root CAs
 #### One CA Certificate, One Secrets Engine
 #### Keep certificate lifetimes short, for CRL's sake
