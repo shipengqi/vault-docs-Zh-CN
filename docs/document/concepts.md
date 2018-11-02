@@ -103,6 +103,62 @@ Vault中的所有动态 secret 都必须具有租约（Lease）。 即使数据�
 
 ## Authentication
 
+Vault 的身份验证就是由一个内部或外部的系统来验证用户或者机器提供的信息的过程。 Vault 支持多种[auth methods]()，包括GitHub，LDAP，AppRole等。
+每个auth 方法都有一个特定的用例。
+
+在客户端可以与 Vault 交互之前，它必须针对 auth 方法进行身份验证。 在验证时，会生成一个令牌。 此令牌在概念上类似于网站上的`session ID`。 令牌可能具有附加策略，
+策略是在认证时映射上去的。
+
+### auth methods
+
+Vault 支持许多 auth 方法。 一些 backends 针对用户，而另一些 backends 针对机器。 大多数身份验证 backends 必须在使用前启用。 要启用身份验证方法：
+```bash
+$ vault write sys/auth/my-auth type=userpass
+```
+这会在路径`my-auth`上启用`userpass` auth 方法。在路径`my-auth`上可以使用这个身份验证来访问。 通常，你会在与其名称相同的路径上看到身份验证，但这不是必需的。
+
+要了解有关此身份验证的更多信息，使用内置的`path-help`命令：
+```bash
+$ vault path-help auth/my-auth
+# ...
+```
+Vault同时支持多种 auth 方法，甚至可以在不同的路径上挂载相同类型的 auth 方法。 必须有一个身份验证才能获得对 Vault 的访问权限，并且目前无法强制用户通过多种
+身份验证方法来获取访问权限，尽管某些后端确实支持MFA。
+
+### Tokens
+
+这是一个[关于 Token 的详细页面]()，但重要的是要了解身份验证的工作方式是验证你的身份，然后生成与该身份相关联的令牌。
+
+例如，即使你可以使用 GitHub 之类的东西进行身份验证，Vault 也会生成一个唯一的访问令牌，供你以后使用。 CLI 会自动将此令牌附加到请求，但如果你使用的是API，
+则必须手动执行此操作。
+
+这个Token 可以为任何后端进行身份验证，也可以与完整的令牌命令集一起使用，例如创建新的`sub-tokens`，撤消令牌和续订令牌。 这些都包含在[Token concepts page]()。
+
+### Authenticating
+#### 使用CLI
+要使用CLI进行身份验证，请使用 Vault 登录。这支持许多内置的`auth`方法。 例如，使用 GitHub `auth`方法：
+```bash
+$ vault login -method=github token=<token>
+...
+```
+身份验证完成后，就会登录，CLI命令还将输出你的原始令牌。此令牌用于撤销和续订。当用户登录时，令牌的主要用例是更新，下面将在“Auth Leases”部分中介绍。
+
+要确定 auth 方法需要哪些变量，请提供`-method`标志，不带任何其他参数，将显示帮助。
+
+#### 使用API
+
+API身份验证通常用于机器的身份验证。 每个 auth 方法都实现自己的登录端点。 使用`vault path-help`机制查找正确的端点。
+
+例如，GitHub登录端点位于`auth/github/login`。 并且为了确定所需的参数，可以使用`vault path-help auth/github/login`。
+
+### Auth Leases
+
+和 secrets 一样，身份也有与之相关的租约（leases）。 这意味着你必须在租约过期后重新进行身份验证才能继续访问Vault。
+
+要设置与身份关联的租约，参考你正在使用的 auth 方法的帮助，可以查看每个后端如何实现租约。
+
+身份也是可以更新的，而不必完全重新认证。只需使用`vault token renew <token>`，这个 Token 是与你的身份相关联的令牌。
+
 ## Tokens
 ## Response Wrapping
 ## Policies
