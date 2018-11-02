@@ -160,6 +160,35 @@ API身份验证通常用于机器的身份验证。 每个 auth 方法都实现�
 身份也是可以更新的，而不必完全重新认证。只需使用`vault token renew <token>`，这个 Token 是与你的身份相关联的令牌。
 
 ## Tokens
+
+Tokens 是 Vault 内部用于验证的核心方法。 Tokens 可以直接使用，或者可以使用 auth 方法基于外部身份动态生成 tokens。
+
+如果你已经阅读了入门指南，可能会注意到`vault server -dev`（或非开发服务器的`vault operator init`）会输出一个初始的`root token`。 这是 Vault 的第一种身份验证方法。
+它也是唯一无法禁用的身份验证方法。
+
+如身概念[Authentication]()中所述，**所有外部身份验证机制（如 GitHub）都映射到动态创建的 tokens**。 这些 tokens 具有与普通手动创建的令牌相同的属性。
+
+在Vault中，tokens 映射到信息。 映射到 tokens 的最重要信息是一组一个或多个附加的[策略]()。这些策略控制允许 tokens 持有者在Vault中执行的操作。
+其他映射信息包括可以查看并添加到审核日志的元数据，创建时间，上次续订时间等。
+
+### Token Types
+### The Token Store
+### Root Tokens
+### Token Hierarchies and Orphan Tokens
+### Token Accessors
+### Token Time-To-Live, Periodic Tokens, and Explicit Max TTLs
+#### The General Case
+#### Explicit Max TTLs
+#### Periodic Tokens
+### CIDR-Bound Tokens
+### Token Types in Detail
+#### Service Tokens
+#### Batch Tokens
+#### Token Type Comparison
+#### Service vs. Batch Token Lease Handling
+##### Service Tokens
+##### Batch Tokens
+
 ## Response Wrapping
 ## Policies
 ## High Availability
