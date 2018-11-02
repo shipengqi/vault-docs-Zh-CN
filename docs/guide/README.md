@@ -272,7 +272,7 @@ vault secrets disable kv/
 并且同时使用相同的读写接口。
 
 ## Dynamic Secrets
-和`kv` secrets 不同的是，你不要自己将数据放入存储中，Dynamic secrets 是在访问它们时生成的。Dynamic secrets 在被读取之前是不存在的，
+和`kv` secrets 不同的是，你不需要将自己的数据放入存储中，Dynamic secrets 是在访问它们时生成的。Dynamic secrets 在被读取之前是不存在的，
 因此不存在有人窃取它们或其他客户使用相同 secrets 的风险。由于 Vault 具有内置的撤销机制，在使用后可以立即撤销 Dynamic secrets，从而最小化了 secrets 存在的时间。
 
 ### 启用 AWS Secrets 引擎

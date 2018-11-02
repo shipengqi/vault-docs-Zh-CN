@@ -70,7 +70,39 @@ $ vault operator unseal -migrate
 将迁移恢复密钥以用作取消密钥。
 
 ## Lease,Renew and Revoke
+对于**每个动态 secret 和`service`类型的身份验证令牌，Vault 都会创建租约（Lease）：包含持续时间，可续订性等信息的元数据**。 Vault 承诺数据在给定的持续时间或
+生存时间（TTL）内有效。 租约到期后，Vault 可以自动撤销（Revoke）数据，并且 secret 的消费者不再能够确定它是否有效。
+
+好处很明显：secrets 的消费者需要定期检查 Vault 以续订租约（如果允许）或要求更换（Renew）secret。 这使得 Vault 审计日志更有价值，并且使密钥滚动变得更加容易。
+
+Vault中的所有动态 secret 都必须具有租约（Lease）。 即使数据是永久有效的，也需要租约，强制消费者定期检查。
+
+除续期外，还可以撤销租约。 当租约被撤销时，它会立即使该 secret 无效并阻止任何进一步的续订。 例如，使用[AWS secrets 引擎]()，在撤销租约时，将从AWS中删除访问密钥。
+
+撤销可以通过API，通过`vault revoke` cli命令手动进行，也可以由Vault自动进行。 租约到期后，Vault将自动撤销该租约。
+
+### Lease IDs
+
+读取动态 secrets 时，例如通过`vault read`，Vault 总是会返回一个`lease_id`。 这是用于`vault renew`和`vault revoke`等命令管理 secret 的租约。
+
+### Lease Durations and Renewal
+
+除了`lease_id`，还可以读取到租约期限（`lease duration`）。 租约期限是生存时间值：租约有效的时间（以秒为单位）。 消费者必须在这个有效时间内续订这个 secret 的租约。
+
+在续订租约时，用户可以从现在开始请求特定的时间来延长租约。 例如：`vault renew my-lease-id 3600`，请求将`my-lease-id`的租约延长1小时（3600秒）。
+
+对于大多数 secrets ，后端通常会限制续约时间，以确保每隔一段时间更新一次。
+
+### Prefix-based Revocation
+
+除了撤销（Revoke）一个 secret 之外，还可以根据`lease_id`撤销多个 secret。
+
+`lease_id`的结构使其前缀始终是请求 secret 的路径。 这可以让你撤销 secret 树。 例如，要撤消所有AWS访问密钥，您可以执行`vault revoke -prefix aws/`。
+
+这是非常有用的：如果特定系统中存在入侵，可以快速地撤销特定后端或某个已配置后端的所有 secrets。
+
 ## Authentication
+
 ## Tokens
 ## Response Wrapping
 ## Policies
