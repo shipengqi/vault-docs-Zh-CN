@@ -70,8 +70,125 @@ $ vault operator unseal -migrate
 将迁移恢复密钥以用作取消密钥。
 
 ## Lease,Renew and Revoke
+对于**每个动态 secret 和`service`类型的身份验证令牌，Vault 都会创建租约（Lease）：包含持续时间，可续订性等信息的元数据**。 Vault 承诺数据在给定的持续时间或
+生存时间（TTL）内有效。 租约到期后，Vault 可以自动撤销（Revoke）数据，并且 secret 的消费者不再能够确定它是否有效。
+
+好处很明显：secrets 的消费者需要定期检查 Vault 以续订租约（如果允许）或要求更换（Renew）secret。 这使得 Vault 审计日志更有价值，并且使密钥滚动变得更加容易。
+
+Vault中的所有动态 secret 都必须具有租约（Lease）。 即使数据是永久有效的，也需要租约，强制消费者定期检查。
+
+除续期外，还可以撤销租约。 当租约被撤销时，它会立即使该 secret 无效并阻止任何进一步的续订。 例如，使用[AWS secrets 引擎]()，在撤销租约时，将从AWS中删除访问密钥。
+
+撤销可以通过API，通过`vault revoke` cli命令手动进行，也可以由Vault自动进行。 租约到期后，Vault将自动撤销该租约。
+
+### Lease IDs
+
+读取动态 secrets 时，例如通过`vault read`，Vault 总是会返回一个`lease_id`。 这是用于`vault renew`和`vault revoke`等命令管理 secret 的租约。
+
+### Lease Durations and Renewal
+
+除了`lease_id`，还可以读取到租约期限（`lease duration`）。 租约期限是生存时间值：租约有效的时间（以秒为单位）。 消费者必须在这个有效时间内续订这个 secret 的租约。
+
+在续订租约时，用户可以从现在开始请求特定的时间来延长租约。 例如：`vault renew my-lease-id 3600`，请求将`my-lease-id`的租约延长1小时（3600秒）。
+
+对于大多数 secrets ，后端通常会限制续约时间，以确保每隔一段时间更新一次。
+
+### Prefix-based Revocation
+
+除了撤销（Revoke）一个 secret 之外，还可以根据`lease_id`撤销多个 secret。
+
+`lease_id`的结构使其前缀始终是请求 secret 的路径。 这可以让你撤销 secret 树。 例如，要撤消所有AWS访问密钥，您可以执行`vault revoke -prefix aws/`。
+
+这是非常有用的：如果特定系统中存在入侵，可以快速地撤销特定后端或某个已配置后端的所有 secrets。
+
 ## Authentication
+
+Vault 的身份验证就是由一个内部或外部的系统来验证用户或者机器提供的信息的过程。 Vault 支持多种[auth methods]()，包括GitHub，LDAP，AppRole等。
+每个auth 方法都有一个特定的用例。
+
+在客户端可以与 Vault 交互之前，它必须针对 auth 方法进行身份验证。 在验证时，会生成一个令牌。 此令牌在概念上类似于网站上的`session ID`。 令牌可能具有附加策略，
+策略是在认证时映射上去的。
+
+### auth methods
+
+Vault 支持许多 auth 方法。 一些 backends 针对用户，而另一些 backends 针对机器。 大多数身份验证 backends 必须在使用前启用。 要启用身份验证方法：
+```bash
+$ vault write sys/auth/my-auth type=userpass
+```
+这会在路径`my-auth`上启用`userpass` auth 方法。在路径`my-auth`上可以使用这个身份验证来访问。 通常，你会在与其名称相同的路径上看到身份验证，但这不是必需的。
+
+要了解有关此身份验证的更多信息，使用内置的`path-help`命令：
+```bash
+$ vault path-help auth/my-auth
+# ...
+```
+Vault同时支持多种 auth 方法，甚至可以在不同的路径上挂载相同类型的 auth 方法。 必须有一个身份验证才能获得对 Vault 的访问权限，并且目前无法强制用户通过多种
+身份验证方法来获取访问权限，尽管某些后端确实支持MFA。
+
+### Tokens
+
+这是一个[关于 Token 的详细页面]()，但重要的是要了解身份验证的工作方式是验证你的身份，然后生成与该身份相关联的令牌。
+
+例如，即使你可以使用 GitHub 之类的东西进行身份验证，Vault 也会生成一个唯一的访问令牌，供你以后使用。 CLI 会自动将此令牌附加到请求，但如果你使用的是API，
+则必须手动执行此操作。
+
+这个Token 可以为任何后端进行身份验证，也可以与完整的令牌命令集一起使用，例如创建新的`sub-tokens`，撤消令牌和续订令牌。 这些都包含在[Token concepts page]()。
+
+### Authenticating
+#### 使用CLI
+要使用CLI进行身份验证，请使用 Vault 登录。这支持许多内置的`auth`方法。 例如，使用 GitHub `auth`方法：
+```bash
+$ vault login -method=github token=<token>
+...
+```
+身份验证完成后，就会登录，CLI命令还将输出你的原始令牌。此令牌用于撤销和续订。当用户登录时，令牌的主要用例是更新，下面将在“Auth Leases”部分中介绍。
+
+要确定 auth 方法需要哪些变量，请提供`-method`标志，不带任何其他参数，将显示帮助。
+
+#### 使用API
+
+API身份验证通常用于机器的身份验证。 每个 auth 方法都实现自己的登录端点。 使用`vault path-help`机制查找正确的端点。
+
+例如，GitHub登录端点位于`auth/github/login`。 并且为了确定所需的参数，可以使用`vault path-help auth/github/login`。
+
+### Auth Leases
+
+和 secrets 一样，身份也有与之相关的租约（leases）。 这意味着你必须在租约过期后重新进行身份验证才能继续访问Vault。
+
+要设置与身份关联的租约，参考你正在使用的 auth 方法的帮助，可以查看每个后端如何实现租约。
+
+身份也是可以更新的，而不必完全重新认证。只需使用`vault token renew <token>`，这个 Token 是与你的身份相关联的令牌。
+
 ## Tokens
+
+Tokens 是 Vault 内部用于验证的核心方法。 Tokens 可以直接使用，或者可以使用 auth 方法基于外部身份动态生成 tokens。
+
+如果你已经阅读了入门指南，可能会注意到`vault server -dev`（或非开发服务器的`vault operator init`）会输出一个初始的`root token`。 这是 Vault 的第一种身份验证方法。
+它也是唯一无法禁用的身份验证方法。
+
+如身概念[Authentication]()中所述，**所有外部身份验证机制（如 GitHub）都映射到动态创建的 tokens**。 这些 tokens 具有与普通手动创建的令牌相同的属性。
+
+在Vault中，tokens 映射到信息。 映射到 tokens 的最重要信息是一组一个或多个附加的[策略]()。这些策略控制允许 tokens 持有者在Vault中执行的操作。
+其他映射信息包括可以查看并添加到审核日志的元数据，创建时间，上次续订时间等。
+
+### Token Types
+### The Token Store
+### Root Tokens
+### Token Hierarchies and Orphan Tokens
+### Token Accessors
+### Token Time-To-Live, Periodic Tokens, and Explicit Max TTLs
+#### The General Case
+#### Explicit Max TTLs
+#### Periodic Tokens
+### CIDR-Bound Tokens
+### Token Types in Detail
+#### Service Tokens
+#### Batch Tokens
+#### Token Type Comparison
+#### Service vs. Batch Token Lease Handling
+##### Service Tokens
+##### Batch Tokens
+
 ## Response Wrapping
 ## Policies
 ## High Availability
