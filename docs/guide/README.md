@@ -910,7 +910,7 @@ existing unseal keys shares. See "vault operator rekey" for more information.
 
 ## Seal/Unseal
 
-每个初始化的Vault服务器都以密封De 状态启动。从配置中，Vault可以访问物理存储，但是它不能读取任何数据，因为它不知道如何解密它。教Vault如何解密数据的过程是已知的。
+每个初始化的Vault服务器都以密封的状态启动。从配置中，Vault可以访问物理存储，但是它不能读取任何数据，因为它不知道如何解密它。教Vault如何解密数据的过程是已知的。
 
 每次 Vault 启动的时候都会解封。它可以通过API和命令行完成。要解封 Vault，你必须有阈值数的`unseal keys`。上面的输出中，注意到`key threshold`是 3。
 这意味着要解封 Vault，需要已经生成的 5 个`unseal key`中的 3 个。
