@@ -246,7 +246,7 @@ vault secrets enable -path=kv kv
 Success! Enabled the kv secrets engine at: kv/
 ```
 
-在 `kv/` 路径上启用了`kv` secrets 引擎。**启用 secrets 引擎的路径默认是 secrets 引擎的名称**。也就是说`vault secrets enable kv`和上面的命令
+在 `kv/` 路径上启用了`kv` secrets 引擎。**启用 secrets 引擎的路径默认是 secrets 引擎的名称**。也就是说 `vault secrets enable kv` 和上面的命令
 是一样的效果。
 
 查看是否操作成功，获取 secrets 引擎更多信息，使用 `vault secrets list` 命令：
@@ -285,8 +285,8 @@ vault secrets disable kv/
 并且同时使用相同的读写接口。
 
 ## Dynamic Secrets
-和 `kv` secrets 不同的是，你不需要自己将数据放入存储中，Dynamic secrets 是在访问它们时生成的。Dynamic secrets 在被读取之前是不存在的，
-因此不存在有人窃取它们或其他客户使用相同 secrets 的风险。由于 Vault 具有内置的撤销机制，Dynamic secrets 可以在使用后立即撤销，从而最小化了 secrets 存在的时间。
+和 `kv` secrets 不同的是，你不需要自己将数据放入存储中，**Dynamic secrets 是在访问它们时生成的。Dynamic secrets 在被读取之前是不存在的，
+因此不存在有人窃取它们或其他客户使用相同 secrets 的风险**。由于 Vault 具有内置的撤销机制，Dynamic secrets 可以在使用后立即撤销，从而最小化了 secrets 存在的时间。
 
 ### 启用 AWS Secrets 引擎
 AWS secrets 引擎不像 `kv` secrets 引擎一样被默认启用，需要自己在使用前启用。
@@ -296,7 +296,7 @@ vault secrets enable -path=aws aws
 正如我们在前几节中所讨论的，不同的 secrets 引擎允许不同的行为。这个例子中，AWS secrets 引擎生成动态的、按需的 AWS 访问凭证。
 
 ### 配置 AWS Secrets 引擎
-在启用 AWS secrets 引擎之后，必须将其配置为进行身份验证并与 AWS 进行通信。这需要特权帐户凭证。如果您不熟悉 AWS，请使用根帐户密钥（**不要在生产环境下使用根帐户密钥**）。
+在启用 AWS secrets 引擎之后，必须将其配置为进行身份验证并与 AWS 进行通信。这需要特权帐户凭证。如果你不熟悉 AWS，请使用根帐户密钥（**不要在生产环境下使用根帐户密钥**）。
 
 ```bash
 vault write aws/config/root \
@@ -308,12 +308,12 @@ Success! Data written to: aws/config/root
 ```
 这些凭证现在存储在这个 AWS secrets 引擎中。在将来的请求中，引擎将在与 AWS 通信时使用这些凭证。
 
-### 创建`role`
+### 创建 `role`
 配置一个 `role`，Vault 中 `role` 是对操作友好的标识符。把它看作一个符号链接。
 
 Vault 知道如何通过 AWS API 创建 IAM 用户，但是它不知道想要附加到该用户的权限、组和策略。这就是 `role` 的作用—— `role` 将你的配置选项映射到那些 API 调用。
 
-例如，这里有一个支持 EC2 上所有操作的IAM策略。当 Vault 生成访问密钥时，它将自动附加此策略。生成的访问密钥访问 EC2 (由此策略决定)的所有权限，但不能访问 IAM 或其他 AWS 服务。
+例如，这里有一个支持 EC2 上所有操作的 IAM 策略。当 Vault 生成访问密钥时，它将自动附加此策略。生成的访问密钥访问 EC2 (由此策略决定)的所有权限，但不能访问 IAM 或其他 AWS 服务。
 
 ```bash
 {
@@ -378,7 +378,7 @@ security_token     <nil>
 ### 撤销 Secret
 Vault 将在 768 小时后自动撤销此凭据(查看上面输出中的 `lease_duration` 字段)，但我们可能希望尽早撤销它。一旦密钥被撤销，访问密钥就不再有效。
 
-若要撤消 Secret ，使用`vault revoke`加上之前保存的`lease_id`:
+若要撤消 Secret ，使用 `vault revoke` 加上之前保存的 `lease_id`:
 ```bash
 $ vault lease revoke aws/creds/my-role/0bce0782-32aa-25ec-f61d-c026ff22106
 
@@ -396,7 +396,7 @@ Success! Revoked lease: aws/creds/my-role/0bce0782-32aa-25ec-f61d-c026ff22106e
 在这两种情况下，每个 secrets 引擎的结构和用法都不同，例如 AWS 后端有一些特殊的路径，比如 `aws/config`。
 
 Vault 有一个内置的帮助系统，而不是必须不断地记住或参考文档以确定使用什么路径。这个帮助系统可以通过 API 或命令行访问，并为任何路径生成可读的帮助。
-使用`vault path-help`命令：
+本小节假设你已经启用了 AWS secerts 引擎在 `aws/` 路径上。使用 `vault path-help` 命令：
 ```bash
 $ vault path-help aws
 
@@ -461,7 +461,7 @@ can be revoked by using the lease ID.
 
 ## Authentication
 
-到目前为止，我们还没有登录到 Vault。**在 dev 模式下启动 Vault 服务器时，它会自动将您作为具有管理权限的根用户登录。
+到目前为止，我们还没有登录到 Vault。**在 dev 模式下启动 Vault 服务器时，它会自动将你作为具有管理权限的根用户登录。
 在非 dev 设置中，必须首先进行身份验证**。
 
 身份验证是向 Vault 用户分配身份的机制。
@@ -496,7 +496,7 @@ token_policies       ["root"]
 identity_policies    []
 policies             ["root"]
 ```
-默认情况下，这将创建当前令牌的子令牌，并且继承所有相同策略。这里 `child` 概念非常重要: **令牌总是有一个父令牌，当父令牌被撤销时，子令牌也可以在同一个操作中全部被撤销。
+默认情况下，这将创建当前令牌的子令牌，并且继承所有相同策略。这里** `child` 概念非常重要: 令牌总是有一个父令牌，当父令牌被撤销时，子令牌也可以在同一个操作中全部被撤销。
 这使得在删除用户访问权限时很容易，也可以删除用户创建的所有子令牌的访问权限**。
 
 使用 `token` 验证：
@@ -518,7 +518,7 @@ identity_policies    []
 policies             ["root"]
 ```
 
-使用`token`验证，它会验证令牌，并让你知道该令牌与什么访问策略相关联。
+使用 `token` 验证，它会验证令牌，并让你知道该令牌与什么访问策略相关联。
 
 撤销创建好的 tokens：
 ```bash
@@ -538,7 +538,7 @@ $ vault login $VAULT_DEV_ROOT_TOKEN_ID
 进行 Vault 身份验证。对于不能生成自己的令牌的遗留应用程序，操作人员可能需要提前创建令牌。
 
 ### Auth Methods
-Vault支持许多 `auth` 方法，但是在使用之前必须启用它们。`auth` 方法提供了灵活性。启用和配置 `auth` 方法通常由 Vault 操作人员或安全团队执行。
+Vault 支持许多 `auth` 方法，但是在使用之前必须启用它们。`auth` 方法提供了灵活性。启用和配置 `auth` 方法通常由 Vault 操作人员或安全团队执行。
 作为一个以人为中心的 `auth` 方法的示例，让我们通过 GitHub 进行身份验证。
 
 首先，启用 GitHub `auth`方法：
@@ -549,7 +549,7 @@ Success! Enabled github auth method at: github/
 ```
 和 secrets 引擎一样，`auth` 方法默认以其 TYPE 作为 PATH，因此 `vault auth enable github` 与上面的命令是等价的。
 
-与在根路由器上启用的 secrets 引擎不同，`auth` 方法总是以 `auth/` 作为前缀。因此，我们刚刚启用的 GitHub `auth` 方法可以在 `auth/gitHub` 上访问。
+与在根路由器上启用的 secrets 引擎不同，`auth` 方法总是以 `auth/` 作为前缀。因此，我们刚刚启用的 GitHub `auth` 方法可以在 `auth/github` 上访问。
 另一个例子：
 ```bash
 $ vault auth enable -path=my-github github
@@ -583,7 +583,7 @@ my-github/    github    auth_github_2a45ccd0    n/a
 token/        token     auth_token_5edaec25     token based credentials
 ```
 
-要了解更多关于如何通过CLI对特定 `auth` 方法进行身份验证的信息，使用 `vault auth help` 命令和 `auth` 方法的 `PATH` 或 `TYPE` 一起使用：
+要了解更多关于如何通过 CLI 对特定 `auth` 方法进行身份验证的信息，使用 `vault auth help` 命令和 `auth` 方法的 `PATH` 或 `TYPE` 一起使用：
 ```bash
 $ vault auth help github
 
@@ -620,7 +620,7 @@ $ vault auth help token
 ```
 
 根据帮助输出，使用 `vault login` 命令对 GitHub 进行身份验证。输入你的
-[GitHub personal access token](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/)，
+ [GitHub personal access token](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/)，
 Vault 将验证你的身份。
 ```bash
 $ vault login -method=github
@@ -659,12 +659,12 @@ Success! Disabled the auth method (if it existed) at: github/
 这也会撤销该 `auth` 方法的任何登录。
 
 ## Policies
-Vault 的策略控制用户可以访问的内容。在上一节中，我们了解了身份验证(`authentication`)。这一部分是关于授权(`authorization`)的。
+Vault 的策略控制用户可以访问的内容。在上一节中，我们了解了身份验证( `authentication` )。这一部分是关于授权( `authorization` )的。
 
 对于身份验证，Vault 可以启用和使用多个选项或方法。Vault 对于授权和策略总是使用相同的格式。所有 `auth` 方法都将身份映射回 Vault 配置的核心策略。
 
 一些内置的策略不能撤销。例如，`root` 和 `default` 策略是必需的策略，不能删除。**`default` 策略提供一组公共权限，默认情况下包含在所有令牌上。
-`root` 策略提供一个令牌超级管理员权限**，类似于 linux 机器上的`root`用户。
+`root` 策略提供一个令牌超级管理员权限**，类似于 linux 机器上的 `root` 用户。
 
 ### 策略格式
 策略是用 [HCL](https://github.com/hashicorp/hcl) 编写的，但与 JSON 兼容。下面是一个策略示例:
@@ -936,7 +936,7 @@ existing unseal keys shares. See "vault operator rekey" for more information.
 每个初始化的 Vault 服务器都是在密封的状态下启动。从配置中，Vault 可以访问物理存储，但是它不能读取任何数据，因为它不知道如何解密它。教 Vault 如何解密数据的过程是已知的。
 
 每次 Vault 启动的时候都会解封。它可以通过 API 和命令行完成。要解封 Vault，你必须有阈值数的 `unseal keys`。上面的输出中，注意到 `key threshold` 是 3。
-这意味着要解封 Vault，需要已经生成的 5 个`unseal key`中的 3 个。
+这意味着要解封 Vault，需要已经生成的 5 个 `unseal key` 中的 3 个。
 
 开始解封 Vault：
 ```bash
@@ -1009,10 +1009,10 @@ token_policies     [root]
 
 ## 使用带有身份验证的 HTTP APIs
 
-除了 CLI 之外，Vault 的所有功能都可以通过HTTP API访问。实际上，CLI的大多数调用实际上都调用HTTP API。在某些情况下，Vault功能不能通过CLI访问，只能通过HTTP API访问。
+除了 CLI 之外，Vault 的所有功能都可以通过 HTTP API 访问。实际上，CLI的大多数调用实际上都调用HTTP API。在某些情况下，Vault 功能不能通过 CLI 访问，只能通过 HTTP API 访问。
 
-启动Vault服务器后，可以使用`curl`或任何其他`http`客户端进行API调用。例如，如果在[dev mode](https://www.vaultproject.io/docs/concepts/dev-server.html)下
-启动Vault服务器，可以这样验证初始化状态：
+启动 Vault 服务器后，可以使用 `curl` 或任何其他 `http` 客户端进行 API 调用。例如，如果在 [dev mode](https://www.vaultproject.io/docs/concepts/dev-server.html) 下
+启动 Vault 服务器，可以这样验证初始化状态：
 ```bash
 $ curl http://127.0.0.1:8200/v1/sys/init
 
@@ -1020,10 +1020,10 @@ $ curl http://127.0.0.1:8200/v1/sys/init
 ```
 
 ### 通过 REST APIs 访问 secrets
-通过它的REST API访问在Vault中的信息。例如，如果机器使用[AppRole](https://www.vaultproject.io/docs/auth/approle.html)进行身份验证，Vault首先对应用程序将
-进行身份验证，返回一个`Vault API`令牌。应用程序将使用该令牌与Vault通信。
+通过它的 REST API 访问在 Vault 中的信息。例如，如果机器使用 [AppRole](https://www.vaultproject.io/docs/auth/approle.html) 进行身份验证，Vault 首先对应用程序将
+进行身份验证，返回一个 `Vault API` 令牌。应用程序将使用该令牌与 Vault 通信。
 
-这里的例子没有启用`TLS`，但是在生产环境下，`TLS`不应该被禁用。保存下面的内容到`config.hcl`，并且启动Vault server：
+这里的例子没有启用 `TLS`，但是在生产环境下，`TLS` 不应该被禁用。保存下面的内容到 `config.hcl`，并且启动 Vault server：
 ```bash
 # 基于文件
 backend "file" {
@@ -1039,7 +1039,7 @@ listener "tcp" {
 $ vault server -config=config.hcl
 ```
 
-至此，我们可以对所有交互使用Vault API。例如，我们可以这样初始化Vault:
+至此，我们可以对所有交互使用 Vault API。例如，我们可以这样初始化 Vault:
 ```bash
 $ curl \
     --request POST \
@@ -1054,11 +1054,11 @@ $ curl \
 }
 ```
 
-这个响应包含我们的`root token`和`unseal key`。可以使用`unseal key`来解封 Vault，并使用`root token`在 Vault 中执行其他需要身份验证的请求。
+这个响应包含我们的 `root token` 和 `unseal key`。可以使用 `unseal key` 来解封 Vault，并使用 `root token` 在 Vault 中执行其他需要身份验证的请求。
 
-为了方便我们把`root token`保存到环境变量`export VAULT_TOKEN=6fa4128e-8bd2-fd02-0ea8-a5e020d9b766`。
+为了方便我们把 `root token` 保存到环境变量 `export VAULT_TOKEN=6fa4128e-8bd2-fd02-0ea8-a5e020d9b766`。
 
-使用`unseal key`通过API来解封 Vault：
+使用 `unseal key` 通过 API 来解封 Vault：
 ```bash
 $ curl \
     --request POST \
@@ -1077,7 +1077,7 @@ $ curl \
 }
 ```
 
-现在所有可用的`auth`方法可以启用和配置了。这里使用[AppRole](https://www.vaultproject.io/docs/auth/approle.html)验证。
+现在所有可用的 `auth` 方法可以启用和配置了。这里使用 [AppRole](https://www.vaultproject.io/docs/auth/approle.html) 验证。
 开始启用 AppRole 验证
 ```bash
 $ curl \
@@ -1087,11 +1087,11 @@ $ curl \
     http://127.0.0.1:8200/v1/sys/auth/approle
 ```
 
-注意，启用AppRole端点的请求需要一个身份验证令牌。在本例中，我们将传递启动Vault服务器时生成的`root token`。我们还可以
-使用任何其他身份验证机制生成令牌，但为了简单起见，我们将使用`root token`。
+注意，启用 AppRole 端点的请求需要一个身份验证令牌。在本例中，我们将传递启动 Vault 服务器时生成的 `root token`。我们还可以
+使用任何其他身份验证机制生成令牌，但为了简单起见，我们将使用 `root token`。
 
-现在，使用所需的[ACL策略集](https://www.vaultproject.io/docs/concepts/policies.html)创建一个 AppRole。在下面的命令中，
-指定在AppRole `my-role`下发布的令牌应该与`dev-policy`和`my-policy`相关联：
+现在，使用所需的 [ACL 策略集](https://www.vaultproject.io/docs/concepts/policies.html)创建一个 AppRole。在下面的命令中，
+指定在 AppRole `my-role` 下发布的令牌应该与 `dev-policy` 和 `my-policy`相 关联：
 ```bash
 $ curl \
     --header "X-Vault-Token: $VAULT_TOKEN" \
@@ -1100,7 +1100,7 @@ $ curl \
     http://127.0.0.1:8200/v1/auth/approle/role/my-role
 ```
 
-在默认配置中，AppRole 后端需要两个很难猜到的凭证，一个`role ID `和一个`secret ID`。获取`my-role`的`role ID `：
+在默认配置中，AppRole 后端需要两个很难猜到的凭证，一个 `role ID ` 和一个 `secret ID`。获取 `my-role` 的 `role ID `：
 ```bash
 $ curl \
     --header "X-Vault-Token: $VAULT_TOKEN" \
@@ -1112,7 +1112,7 @@ $ curl \
   }
 }
 ```
-创建`my-role`的`secret ID`：
+创建 `my-role` 的 `secret ID`：
 ```bash
 $ curl \
     --header "X-Vault-Token: $VAULT_TOKEN" \
@@ -1126,7 +1126,7 @@ $ curl \
   }
 }
 ```
-这两个凭证可以提供给`login`端点以获取新的Vault令牌。
+这两个凭证可以提供给 `login` 端点以获取新的 Vault 令牌。
 ```bash
 $ curl \
     --request POST \
@@ -1147,9 +1147,9 @@ $ curl \
 }
 ```
 
-这个`client_token`可以用作Vault的身份验证。这个令牌将被授权使用`default`,`dev-policy`和`my-policy`策略所包含的所有资源的特定功能。
+这个 `client_token` 可以用作 Vault 的身份验证。这个令牌将被授权使用 `default`,`dev-policy` 和 `my-policy` 策略所包含的所有资源的特定功能。
 
-新获得的令牌可以作为新的VAULT令牌导出，并使用它对VAULT请求进行身份验证。
+新获得的令牌可以作为新的 VAULT 令牌导出，并使用它对 VAULT 请求进行身份验证。
 ```bash
 $ export VAULT_TOKEN="50617721-dfb5-1916-7b13-4091e169d28c"
 
@@ -1175,4 +1175,48 @@ $ curl \
 }
 ```
 
- 更多APIs参考[HTTP APIs 文档](https://www.vaultproject.io/api/index.html)。
+更多 APIs 参考 [HTTP APIs 文档](https://www.vaultproject.io/api/index.html)。
+
+## Web UI
+
+Vault 提供了一个用户交互界面。使用 Vault UI 可以轻松地创建、读取、更新和删除 secrets、进行身份验证、解封等等。
+
+### Dev servers
+当你在 dev 模式下启动 Vault server 时，Vault UI 会自动启用。在浏览器输入 `http://127.0.0.1:8200/ui` 来访问。
+
+输入 root token 来登录。
+
+### Non-Dev servers
+在非 dev 模式下，Vault UI 默认是不启用的。要启用 Vault UI，需要在 Vault 配置文件中设置 `ui` 选项。
+```
+ui = true
+
+listener "tcp" {
+  # ...
+}
+
+storage "consul" {
+  # ...
+}
+```
+
+Vault UI 运行的端口和 Vault server 相同。因此，必须配置至少一个监听的端口才能访问 Vault UI。
+
+例如：
+```
+ui = true
+
+listener "tcp" {
+  address = "10.0.1.35:8200"
+
+  # If bound to localhost, the Vault UI is only
+  # accessible from the local machine!
+  # address = "127.0.0.1:8200"
+}
+...
+```
+
+在这个例子中，可以从子网上的任何机器(假设没有网络防火墙)访问以下 URL: `https://10.0.1.35:8200/ui`。
+
+### Web UI Wizard
+Vault UI 有一个内置的指南，可以指导你完成各种常见 Vault 特性的操作。

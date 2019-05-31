@@ -59,14 +59,14 @@ Vault使用称为[Shamir's Secret Sharing](https://en.wikipedia.org/wiki/Shamir%
 ### Seal Migration
 密封可以在Shamir键和自动解封之间迁移。
 
-要从Shamir键迁移到Auto Unseal，请使服务器群集脱机并使用适当的[密封配置]()更新密封配置。当您重新启动服务器时，使用`-migrate`标志运行解封过程。
+要从Shamir键迁移到Auto Unseal，请使服务器群集脱机并使用适当的[密封配置]()更新密封配置。当你重新启动服务器时，使用`-migrate`标志运行解封过程。
 所有`unseal`命令都必须指定`-migrate`标志。输入所需的密封密钥阈值后，密封密钥将迁移到恢复密钥。
 ```bash
 $ vault operator unseal -migrate
 ```
 
 要从`Auto Unseal`迁移到Shamir键，请使服务器群集脱机并更新密封配置并将`disabled =“true”`添加到密封块。这允许迁移使用此信息来解密密钥，但不会启动Vault。
-当您重新启动服务器时，使用`-migrate`标志运行`unseal`进程并使用`Recovery Keys`执行迁移。所有`unseal`命令都必须指定`-migrate`标志。输入所需的恢复密钥阈值后，
+当你重新启动服务器时，使用`-migrate`标志运行`unseal`进程并使用`Recovery Keys`执行迁移。所有`unseal`命令都必须指定`-migrate`标志。输入所需的恢复密钥阈值后，
 将迁移恢复密钥以用作取消密钥。
 
 ## Lease,Renew and Revoke
@@ -97,7 +97,7 @@ Vault中的所有动态 secret 都必须具有租约（Lease）。 即使数据�
 
 除了撤销（Revoke）一个 secret 之外，还可以根据`lease_id`撤销多个 secret。
 
-`lease_id`的结构使其前缀始终是请求 secret 的路径。 这可以让你撤销 secret 树。 例如，要撤消所有AWS访问密钥，您可以执行`vault revoke -prefix aws/`。
+`lease_id`的结构使其前缀始终是请求 secret 的路径。 这可以让你撤销 secret 树。 例如，要撤消所有AWS访问密钥，你可以执行`vault revoke -prefix aws/`。
 
 这是非常有用的：如果特定系统中存在入侵，可以快速地撤销特定后端或某个已配置后端的所有 secrets。
 
