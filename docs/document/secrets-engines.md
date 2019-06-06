@@ -1,6 +1,6 @@
 # Secrets 引擎
 ## PKI Secrets Engine
-PKI secrets 引擎生成动态X.509证书。使用这个 secrets 引擎，服务可以获得证书，而不需要手动生成私钥和CSR，提交到CA，并等待验证和签名完成。
+PKI secrets 引擎生成动态 `X.509` 证书。使用这个 secrets 引擎，服务可以获得证书，而不需要手动生成私钥和 CSR，提交到 CA，并等待验证和签名完成。
 Vault 的内置身份验证和授权机制提供了验证功能。
 
 通过保持相对较短的 TTL，不太可能需要撤销操作，保持 CRL 简短并帮助 secrets 引擎扩展到大型工作负载。 反过来就允许每个正在运行的应用程序实例都具有唯一的证书，
@@ -17,9 +17,9 @@ Vault 的内置身份验证和授权机制提供了验证功能。
 $ vault secrets enable pki
 Success! Enabled the pki secrets engine at: pki/
 ```
-默认情况下，secrets 引擎将安装在引擎名称同名的路径上。要在不同路径上启用 secrets 引擎，使用`-path`参数。
+**默认情况下，secrets 引擎将安装在引擎名称同名的路径上**。要在不同路径上启用 secrets 引擎，使用 `-path` 参数。
 
-2. 调整 secrets 引擎，增加 TTL。 默认值30天可能太短，因此将其增加到1年：
+2. 调整 secrets 引擎，增加 TTL。 默认值 30 天可能太短，因此将其增加到 1 年：
 ```bash
 $ vault secrets tune -max-lease-ttl=8760h pki
 Success! Tuned the secrets engine at: pki/
@@ -27,7 +27,7 @@ Success! Tuned the secrets engine at: pki/
 
 注意，这只是配置这个 secrets 引擎的全局的最大值。每个角色可以把每个证书的 TTL 限制为更短。
 
-3. 配置 CA 证书和私钥。 Vault 可以接受现有密钥对，也可以生成自己的自签名根。通常，我们建议将**根CA**保留在Vault之外，并为 Vault 提供签名的中间CA。
+3. 配置 CA 证书和私钥。 Vault 可以接受现有密钥对，也可以生成自己的自签名根。通常，我们建议将**根 CA **保留在 Vault 之外，并为 Vault 提供签名的中间 CA。
 ```bash
 $ vault write pki/root/generate/internal \
     common_name=my-website.com \
@@ -41,9 +41,9 @@ issuing_ca       -----BEGIN CERTIFICATE-----...
 serial_number    7c:f1:fb:2c:6e:4d:99:0e:82:1b:08:0a:81:ed:61:3e:1d:fa:f5:29
 ```
 
-返回的证书纯粹是提供信息。 私钥安全地存储在Vault内部。
+返回的证书纯粹是提供信息。 私钥安全地存储在 Vault 内部。
 
-4. 更新CRL位置并颁发证书。 这些值可以在以后更新。
+4. 更新 CRL 位置并颁发证书。 这些值可以在以后更新。
 ```bash
 $ vault write pki/config/urls \
     issuing_certificates="http://127.0.0.1:8200/v1/pki/ca" \
@@ -51,7 +51,7 @@ $ vault write pki/config/urls \
 Success! Data written to: pki/config/urls
 ```
 
-5. 配置一个`role`，在 Vault 中的映射一个名字到生成证书的过程中。 当用户或计算机生成凭据时，将根据此角色生成凭据：
+5. 配置一个 `role`，在 Vault 中的映射一个名字到生成证书的过程中。 当用户或计算机生成凭据时，将根据此角色生成凭据：
 ```bash
 $ vault write pki/roles/my-role \
     allowed_domains=my-website.com \
@@ -62,9 +62,9 @@ Success! Data written to: pki/roles/my-role
 
 ### Usage
 
-配置好 secrets 引擎并且用户或者计算机有了一个一定权限的`Vault token`，就可以生成凭据。
+配置好 secrets 引擎并且用户或者计算机有了一个一定权限的 `Vault token`，就可以生成凭据。
 
-1. 通过写入`/issue`端点，并带上`role name`，来生成新凭据：
+1. 通过写入 `/issue` 端点，并带上 `role name`，来生成新凭据：
 ```bash
 $ vault write pki/issue/my-role \
     common_name=www.my-website.com
@@ -78,7 +78,7 @@ private_key_type    rsa
 serial_number       1d:2e:c6:06:45:18:60:0e:23:d6:c5:17:43:c0:fe:46:ed:d1:50:be
 ```
 
-输出中会包含一个动态生成的私钥和证书，它对应了给定的`role`，并在 72h 到期（由我们的`role`定义决定）。为了简化自动化，还会返回`issuing_ca`和信任链。
+输出中会包含一个动态生成的私钥和证书，它对应了给定的 `role`，并在 72h 到期（由我们的 `role` 定义决定）。为了简化自动化，还会返回 `issuing_ca` 和信任链。
 
 ### Considerations
 
@@ -86,52 +86,52 @@ serial_number       1d:2e:c6:06:45:18:60:0e:23:d6:c5:17:43:c0:fe:46:ed:d1:50:be
 
 #### Be Careful with Root CAs
 
-Vault 存储是安全的，但不如银行保险库中的纸张安全。 毕竟，这是网络软件。 如果你的 根CA 托管在Vault之外，请不要将其放在Vault中; 相反，发出一个寿命较短的中间CA证书并将
-其放入Vault。 这符合行业最佳实践。
+Vault 存储是安全的，但不如银行保险库中的纸张安全。毕竟，这是网络软件。**如果你的 `根 CA` 托管在 Vault 之外，请不要将其放在 Vault 中;相反，发出一个寿命较短的中间 CA 证书并将
+其放入 Vault。这符合行业最佳实践**。
 
-从 0.4 开始，secrets 引擎支持生成自签名 根CA 以及为 中间CA 创建和签署 CSR。 在每个实例中，出于安全原因，私钥只能在生成时导出，并且执行此操作的能力是命令路径的
-一部分（因此可以将其放入ACL策略中）。
+从 0.4 开始，secrets 引擎支持生成自签名 `根 CA` 以及为 `中间 CA` 创建和签署 CSR。在每个实例中，出于安全原因，私钥只能在生成时导出，并且执行此操作的能力是命令路径的
+一部分（因此可以将其放入 ACL 策略中）。
 
-如果你计划将 中间CA 与Vault一起使用，建议让Vault创建 CSR 并且不导出私钥，然后使用根CA（可能是pki secrets引擎的第二个挂载）对其进行签名。
+如果你计划将 `中间 CA` 与 Vault 一起使用，建议让 Vault 创建 CSR 并且不导出私钥，然后使用 `根CA`（可能是 pki secrets 引擎的第二个挂载）对其进行签名。
 
 #### One CA Certificate, One Secrets Engine
 
-为了简化PKI secrets 引擎的配置和代码库，每个 secrets 引擎只允许一个 CA 证书。 如果要从多个 CA 颁发证书，将PKI secrets 引擎安装在多个安装点，每个安装点都
-有单独的CA证书。
+为了简化 PKI secrets 引擎的配置和代码库，每个 secrets 引擎只允许一个 CA 证书。 如果要从多个 CA 颁发证书，将 PKI secrets 引擎安装在多个安装点，每个安装点都
+有单独的 CA 证书。
 
-这也提供了一种切换到新CA证书的便捷方法，同时保持 CRL 对旧CA证书有效; 只需安装一个新的 secrets 引擎并从那里发出。
+这也提供了一种切换到新 CA 证书的便捷方法，同时保持 CRL 对旧 CA 证书有效; 只需安装一个新的 secrets 引擎并从那里发出。
 
-常见模式是将一个安装程序用作 根CA，并仅使用此CA从其他 PKI secrets 引擎签署中间CA CSR。
+常见模式是将一个安装程序用作 `根 CA`，并仅使用此 CA 从其他 PKI secrets 引擎签署中间 CA CSR。
 
 #### Keep certificate lifetimes short, for CRL's sake
-这个 secrets 引擎与 Vault 短暂的 secrets 理念保持一致。 因此，预计 CRL 不会增长; 唯一返回私钥的地方是请求客户端（此 secrets 引擎不存储生成的私钥，CA证书除外）。
+这个 secrets 引擎与 Vault 短暂的 secrets 理念保持一致。 因此，预计 CRL 不会增长; 唯一返回私钥的地方是请求客户端（此 secrets 引擎不存储生成的私钥，CA 证书除外）。
 在大多数情况下，如果密钥丢失，则可以简单地忽略证书，因为它很快就会过期。
 
-如果必须撤销证书，则可以使用正常的Vault撤销功能; 或者，可以使用根令牌来使用证书的序列号撤销证书。任何撤销操作都将导致重新生成CRL。重新生成CRL时，将从CRL中删除所
+如果必须撤销证书，则可以使用正常的 Vault 撤销功能; 或者，可以使用根令牌来使用证书的序列号撤销证书。任何撤销操作都将导致重新生成 CRL。重新生成 CRL 时，将从 CRL 中删除所
 有过期的证书（并且从 secrets 引擎存储中删除任何已撤销的过期证书）。
 
-这个 secrets 引擎不支持具有滑动日期窗口的多个CRL端点; 通常这样的机制将具有相隔几天的转换点，但是这进入了从这个 secrets 引擎发出的实际证书有效期的预期范围。
-这个 secrets 引擎的一个好的经验法则是不发布有效期大于最大舒适CRL生命周期的证书。 或者，可以控制客户端上的CRL缓存行为，以确保更频繁地进行检查。
+这个 secrets 引擎不支持具有滑动日期窗口的多个 CRL 端点; 通常这样的机制将具有相隔几天的转换点，但是这进入了从这个 secrets 引擎发出的实际证书有效期的预期范围。
+这个 secrets 引擎的一个好的经验法则是不发布有效期大于最大舒适 CRL 生命周期的证书。 或者，可以控制客户端上的CRL缓存行为，以确保更频繁地进行检查。
 
-通常在单个CRL端点关闭时使用多个端点，以便客户端不必弄清楚如何处理缺少响应。 在HA模式下运行Vault，即使特定节点关闭，CRL端点也应可用。
+通常在单个 CRL 端点关闭时使用多个端点，以便客户端不必弄清楚如何处理缺少响应。 在 HA 模式下运行 Vault，即使特定节点关闭，CRL 端点也应可用。
 
 #### You must configure issuing/CRL/OCSP information in advance
-这个 secrets 引擎从可预测的位置提供CRL，但 secrets 引擎不可能知道它在哪里运行。因此，必须使用`config/urls`端点手动为颁发证书，CRL分发点和OCSP服务器配置所需的URL。
+这个 secrets 引擎从可预测的位置提供 CRL，但 secrets 引擎不可能知道它在哪里运行。因此，必须使用 `config/urls` 端点手动为颁发证书，CRL 分发点和 OCSP 服务器配置所需的 URL。
 通过将多个URL作为逗号分隔的字符串参数传递，支持它们中的每一个都有多个。
 
 #### Safe Minimums
-自成立以来，这个秘密引擎已经强制使用SHA256签名哈希而不是SHA1。 从0.5.1开始，RSA密钥的最小值为2048位。 可以处理SHA256签名的软件也应该能够处理2048位密钥，
-并且1024位密钥被认为是不安全的，并且在Internet PKI中是不允许的。
+自成立以来，这个秘密引擎已经强制使用 SHA256 签名哈希而不是 SHA1。 从 0.5.1 开始，RSA 密钥的最小值为 2048 位。 可以处理 SHA256 签名的软件也应该能够处理 2048 位密钥，
+并且 1024 位密钥被认为是不安全的，并且在 Internet PKI 中是不允许的。
 
 #### Token Lifetimes and Revocation
-当令牌到期时，它会撤销与之关联的所有租约。 这意味着长期使用的CA证书需要相应的长期令牌，这很容易被遗忘。 从0.6开始，根CA和中间CA证书不再具有关联租约，
-以防止在不使用具有足够长寿命的令牌时意外撤销。要撤消这些证书，使用`pki/revoke`端点。
+当令牌到期时，它会撤销与之关联的所有租约。 这意味着长期使用的 CA 证书需要相应的长期令牌，这很容易被遗忘。 从 0.6 开始，`根 CA` 和 `中间 CA` 证书不再具有关联租约，
+以防止在不使用具有足够长寿命的令牌时意外撤销。要撤消这些证书，使用 `pki/revoke` 端点。
 
 ### Quick Start
 
 #### Mount the backend
 
-使用`pki`后端的第一步是挂载它。 与`kv`后端不同，默认情况下不会安装`pki`后端。
+使用 `pki` 后端的第一步是挂载它。 与 `kv` 后端不同，默认情况下不会安装 `pki` 后端。
 ```bash
 $ vault secrets enable pki
 Successfully mounted 'pki' at 'pki'!
@@ -139,15 +139,15 @@ Successfully mounted 'pki' at 'pki'!
 
 #### Configure a CA certificate
 
-下一步，必须使用 CA证书 和关联的私钥配置Vault。 我们将利用后端的自签名根生成支持，但 Vault 还支持生成 中间CA（使用CSR进行签名）或将PEM编码的证书和私钥包直接设
+下一步，必须使用 CA 证书和关联的私钥配置 Vault。 我们将利用后端的自签名根生成支持，但 Vault 还支持生成 `中间 CA`（使用CSR进行签名）或将 PEM 编码的证书和私钥包直接设
 置到后端。
 
-通常，希望根证书仅用于签署CA中间证书，但是对于此示例，我们将继续执行，将直接从根颁发证书。 因为它是根，我们要为证书设置一个很长的最大生命周期; 首先调整：
+通常，希望根证书仅用于签署 CA 中间证书，但是对于此示例，我们将继续执行，将直接从根颁发证书。 因为它是根，我们要为证书设置一个很长的最大生命周期; 首先调整：
 ```bash
 $ vault secrets tune -max-lease-ttl=87600h pki
 Successfully tuned mount 'pki'!
 ```
-这里设置 secrets 的从挂载发出后的最大TTL为10年。 （请注意，`role`可以进一步限制最大TTL。）
+这里设置 secrets 的从挂载发出后的最大 TTL 为 10 年。 （请注意，`role` 可以进一步限制最大 TTL。）
 
 现在，生成根证书：
 ```bash
@@ -202,13 +202,13 @@ serial_number   26:aa:f0:ff:d1:03:65:ba:78:0c:4c:5a:2e:38:74:bd:20:07:c8:18
 
 #### Set URL configuration
 
-生成的证书可以具有 CRL 位置和 颁发证书编码的位置。 这些值必须手动设置，通常设置为与Vault服务器关联的FQDN，但可以随时更改。
+生成的证书可以具有 CRL 位置和颁发证书编码的位置。 这些值必须手动设置，通常设置为与 Vault 服务器关联的 FQDN，但可以随时更改。
 ```bash
 $ vault write pki/config/urls issuing_certificates="http://vault.example.com:8200/v1/pki/ca" crl_distribution_points="http://vault.example.com:8200/v1/pki/crl"
 Success! Data written to: pki/ca/urls
 ```
 #### Configure a role
-下一步是配置`role`。 `role`是映射到用于生成这些凭据的策略的逻辑名称。 例如，我们创建一个“example-dot-com”的`role`：
+下一步是配置 `role`。 `role` 是映射到用于生成这些凭据的策略的逻辑名称。 例如，我们创建一个 “example-dot-com” 的 `role`：
 ```bash
 $ vault write pki/roles/example-dot-com \
     allowed_domains=example.com \
@@ -217,7 +217,7 @@ Success! Data written to: pki/roles/example-dot-com
 ```
 
 #### Issue Certificates
-通过写入`roles/example-dot-com`路径，我们定义了`example-dot-com`角色。 要生成新证书，我们只需使用该`role`名称写入`issue`端点：Vault现已配置好，可以创建和管理证书。
+通过写入 `roles/example-dot-com` 路径，我们定义了 `example-dot-com` 角色。要生成新证书，我们只需使用该 `role` 名称写入 `issue` 端点：Vault 现已配置好，可以创建和管理证书。
 ```bash
 $ vault write pki/issue/example-dot-com \
     common_name=blah.example.com
@@ -297,17 +297,17 @@ private_key_type    rsa
 serial_number       59:0b:af:a4:ca:40:db:29:b7:e8:4a:22:63:27:f7:3a:ce:54:78:8a
 ```
 
-Vault现在使用`example-dot-com`角色配置生成一组新凭据。 在这里，我们看到动态生成的私钥和证书。
+Vault 现在使用 `example-dot-com` 角色配置生成一组新凭据。在这里，我们看到动态生成的私钥和证书。
 
-使用ACL，可以限制使用`pki`后端，以便可信操作者可以管理角色定义，并且用户和应用程序都受限于这个凭据，仅允许读取。
+使用 ACL，可以限制使用 `pki` 后端，以便可信操作者可以管理角色定义，并且用户和应用程序都受限于这个凭据，仅允许读取。
 
-如果在任何时候遇到困难，只需运行`vault path-help pki`或使用子路径输出帮助。
+如果在任何时候遇到困难，只需运行 `vault path-help pki` 或使用子路径输出帮助。
 
 ### Setting Up Intermediate CA
-在快速入门指南中，证书直接从根证书颁发机构颁发。 如示例中所述，这不是推荐的做法。 本指南以先前指南的根证书颁发机构为基础，使用根权限创建中间权限以签署中间证书。
+在快速入门指南中，证书直接从根证书颁发机构颁发。 如示例中所述，这不是推荐的做法。本指南以先前指南的根证书颁发机构为基础，使用根权限创建中间权限以签署中间证书。
 
 #### Mount the backend
-要将另一个证书颁发机构添加到Vault实例，我们必须将其安装在其他路径上。
+要将另一个证书颁发机构添加到 Vault 实例，我们必须将其安装在其他路径上。
 ```bash
 $ vault secrets enable -path=pki_int pki
 Successfully mounted 'pki' at 'pki_int'!
@@ -318,7 +318,7 @@ Successfully mounted 'pki' at 'pki_int'!
 $ vault secrets tune -max-lease-ttl=43800h pki_int
 Successfully tuned mount 'pki_int'!
 ```
-这里将最大TTL设置为5年。 此值应小于或等于根证书颁发机构。
+这里将最大 TTL 设置为5年。 此值应小于或等于根证书颁发机构。
 
 现在，我们生成中间证书签名请求
 ```bash
@@ -398,13 +398,13 @@ Success! Data written to: pki_int/intermediate/set-signed
 现在配置好了中间证书颁发机构，并且可以颁发证书。
 
 #### Set URL configuration
-生成的证书可以具有CRL位置和颁发证书编码的位置。 这些值必须手动设置，但可以随时更改。
+生成的证书可以具有 CRL 位置和颁发证书编码的位置。 这些值必须手动设置，但可以随时更改。
 ```bash
 $ vault write pki_int/config/urls issuing_certificates="http://127.0.0.1:8200/v1/pki_int/ca" crl_distribution_points="http://127.0.0.1:8200/v1/pki_int/crl"
 Success! Data written to: pki_int/ca/urls
 ```
 #### Configure a role
-下一步是配置`role`。 `role`是映射到用于生成这些凭据的策略的逻辑名称。 例如，我们创建一个“example-dot-com”的`role`：
+下一步是配置 `role`。 `role` 是映射到用于生成这些凭据的策略的逻辑名称。 例如，我们创建一个 “example-dot-com” 的 `role`：
 ```bash
 $ vault write pki_int/roles/example-dot-com \
     allowed_domains=example.com \
@@ -412,7 +412,7 @@ $ vault write pki_int/roles/example-dot-com \
 Success! Data written to: pki_int/roles/example-dot-com
 ```
 #### Issue Certificates
-通过写入`roles/example-dot-com`路径，我们定义了`example-dot-com`角色。 要生成新证书，我们只需使用该`role`名称写入`issue`端点：Vault现已配置好，可以创建和管理证书。
+通过写入 `roles/example-dot-com` 路径，我们定义了 `example-dot-com` 角色。 要生成新证书，我们只需使用该 `role` 名称写入 `issue` 端点：Vault 现已配置好，可以创建和管理证书。
 ```bash
 $ vault write pki_int/issue/example-dot-com \
     common_name=blah.example.com
@@ -511,8 +511,8 @@ e9t+2iwryh5+rnq+pg6anmgwHldptJc1XEFZA2UUQ89RP7kOGQF6IkIS
 private_key_type    rsa
 serial_number       3e:20:32:c6:af:a7:20:4e:b1:95:67:fb:86:bc:cb:90:f4:31:b6:f3
 ```
-Vault现在使用`example-dot-com`角色配置生成一组新凭据。 在这里，我们看到动态生成的私钥和证书。 还将返回颁发CA证书和CA信任链。 CA Chain返回信任链中的所有中间权限。
+Vault 现在使用 `example-dot-com` 角色配置生成一组新凭据。 在这里，我们看到动态生成的私钥和证书。 还将返回颁发CA证书和CA信任链。 CA Chain 返回信任链中的所有中间权限。
 不包括根权限，因为底层操作系统通常会信任它。
 
 ### API
-PKI secrets 引擎有完整的 HTTP API，查看更多[PKI secrets engine API]()详情。
+PKI secrets 引擎有完整的 HTTP API，查看更多 [PKI secrets engine API]() 详情。
