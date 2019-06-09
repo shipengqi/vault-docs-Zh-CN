@@ -1,4 +1,39 @@
 # Secrets 引擎
+## Overview
+Secrets 引擎是存储、生成或加密数据的组件。Secrets 引擎是非常灵活的，所以从它们的功能而言是很容易理解的。Secrets 引擎提供了一些数据集，它们对这些数据
+执行一些操作，然后返回一个结果。
+
+一些 Secrets 引擎只是简单地存储和读取数据——比如加密的 Redis/Memcached 。其他 Secrets 引擎连接到其他服务，并根据需要生成动态凭据。其他 Secrets 引擎
+提供加密服务、totp 生成、证书等等。
+
+Secrets 引擎在 Vault 中的一个 `path` 上启用。当一个请求到达 Vault 时，路由器自动将带有路由前缀的任何东西路由到 secret 引擎。通过这种方式，
+每个 secret 引擎都定义了自己的路径和属性。对于用户来说，secret 引擎的行为类似于虚拟文件系统，支持读、写和删除等操作。
+
+### Secrets Engines Lifecycle
+
+大多数 Secrets 引擎都可以通过 CLI 或 API 启用、禁用、调优和移动。Vault 以前的版本将这些称为 "mount"，但是这个术语已经被覆盖了。
+
+- `Enable` - 这将在给定的路径上启用 secret 引擎。除了少数例外，secrets 引擎可以在多个路径上启用。每个 secret 引擎都与它的路径隔离。默认情况下，
+它们在与 `type` 相同的路径上是启用的(例如。`aws` 默认启用于 `aws/` 上)。
+- `Disable` - 这将禁用现有的 secrets 引擎。当一个 secrets 引擎被禁用时，它的所有 secrets 都会被撤销(如果它们支持的话)，并且在物理存储层中为该引
+擎存储的所有数据都会被删除。
+- `Move` - 这将移动现有的 secrets 引擎的 path。这个过程撤销所有 secrets ，因为 secrets 租约与创建它们的 path 绑定在一起。为引擎存储的配置数据
+在移动过程中保持不变。
+- `Tune` - 这将调整 Secrets 引擎(如 TTLs )的全局配置。
+
+一旦一个 secret 引擎被启用，就可以根据它自己的 API 在它的路径上直接与它交互。使用 `vault path -help` 确定它响应的路径。
+
+注意，Vault 中的挂载点不能相互冲突。这个事实有两个广泛的含义。首先，你不能有一个以已存在的挂载为前缀的挂载。第二，你不能创建一个名为已存在的挂载前缀的挂载点。
+例如，挂载 `foo/bar` 和 `foo/baz` 可以和平共处，而 `foo` 和 `foo/baz` 则不能
+
+### Barrier View
+secret 引擎接受一个 `barrier view` 已配置的 vault 物理存储。这很像 [chroot](https://en.wikipedia.org/wiki/Chroot)。
+
+当启用 secret 引擎时，将生成一个随机 UUID。这将成为该引擎的数据根。每当该引擎写入物理存储层时，它都以该 UUID 文件夹作为前缀。
+由于 Vault 存储层不支持相对访问(例如 `../`)，这使得启用的 secret 引擎不可能访问其他数据。
+
+这是 Vault 中一个重要的安全特性 —— 即使一个恶意的引擎也不能访问任何其他引擎的数据。
+
 ## PKI Secrets Engine
 PKI secrets 引擎生成动态 `X.509` 证书。使用这个 secrets 引擎，服务可以获得证书，而不需要手动生成私钥和 CSR，提交到 CA，并等待验证和签名完成。
 Vault 的内置身份验证和授权机制提供了验证功能。

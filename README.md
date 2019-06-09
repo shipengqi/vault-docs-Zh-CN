@@ -24,7 +24,7 @@ Vault 是一个为了安全访问 secrets 的工具。一个 secret 可以是你
 
 Vault 的主要特性：
 - **Secure Secret Storage**：任意键/值对 secrets 可以存储在 Vault 中。Vault 在将 secrets 写入持久存储之前对其进行加密，因此访问原始存储并不足以
-获取 secrets 。Vault 可以写入磁盘、[Consul](https://www.consul.io/)等等。
+获取 secrets 。Vault 可以写入磁盘、[Consul](https://www.consul.io/) 等等。
 - **Dynamic Secrets**：Vault 可以为某些系统(如 AWS 或 SQL 数据库)按需生成 secrets。例如，当应用程序需要访问 S3 bucket 时，它会向 Vault 查询凭证，
 Vault 将根据需要生成具有有效权限的 AWS 密钥对。在创建了这些动态 secrets 之后，Vault也会在租约到期后自动撤销它们。
 - **Data Encryption**：Vault 可以加密和解密数据而不需要存储它。这允许安全团队定义加密参数，开发人员无需设计自己的加密方法就可以将加密数据存储在 SQL 之类的位置。
