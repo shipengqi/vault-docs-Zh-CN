@@ -48,7 +48,8 @@ module.exports = {
           'cli',
           'vault-agent',
           'secrets-engines',
-          'auth-methods'
+          'auth-methods',
+          'audit-device'
         ]
       }],
       '/api/': [{

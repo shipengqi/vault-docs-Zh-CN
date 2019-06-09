@@ -3,7 +3,7 @@ Auth 方法是 Vault 中执行身份验证的组件，负责为用户分配标�
 
 通过使用多种身份验证方法，可以使用对你的 Vault 和你的组织的适用的身份验证方法。
 
-例如，在开发人员计算机上，[GitHub 身份验证方法]()最容易使用。 但对于服务器，[AppRole]()方法是推荐的选择。
+例如，在开发人员计算机上，[GitHub 身份验证方法]()最容易使用。 但对于服务器，[AppRole]() 方法是推荐的选择。
 
 要了解有关身份验证的更多信息，请参阅 [authentication concepts page]()。
 
@@ -295,4 +295,96 @@ $ vault login token=<token>
 令牌被直接设置为 HTTP API 的头。报头应该是 `X-VAULT-TOKEN: <token>` 或 `Authorization: Bearer <token>`。
 
 ### API
-Token auth 方法有完整的 HTTP API，查看更多 [ Token auth method API]()详情。
+Token auth 方法有完整的 HTTP API，查看更多 [Token auth method API]() 详情。
+
+## File Audit Device
+`file` 审计设备将审计日志写入文件。这是一个非常简单的审计设备: 将日志附加到文件中。
+
+该设备目前不支持任何 log rotation （日志滚动）。已经有非常稳定且功能丰富的 log rotation 工具，因此建议使用现有的工具。
+
+向 Vault 进程发送 `SIGHUP` 将导致文件审计设备关闭和重新打开它们的底层文件，这有助于满足 log rotation 的需要。
+
+### Examples
+在默认的路径上启用：
+```sh
+$ vault audit enable file file_path=/var/log/vault_audit.log
+```
+
+在不同的路径上启用。可以启用审计设备的多个副本:
+```sh
+$ vault audit enable -path="vault_audit_1" file file_path=/home/user/vault_audit.log
+```
+
+启用 `stdout` 上的日志。这在容器中运行时非常有用:
+```sh
+$ vault audit enable file file_path=stdout
+```
+
+### Configuration
+注意 `audit enable` 命令选项和文件后端配置选项之间的区别。使用 `vault audit enable -help` 查看命令选项。下面是后端可用的配置选项。
+
+- `file_path` `(string: <required>)` - 将写入审计日志的路径。如果在给定路径上已经存在一个文件，审计后端将追加到该文件。有一些特殊的关键词:
+  - `stdout` 将审计日志写到标准输出
+  - `discard` 写入输出(在测试场景中非常有用)
+- `log_raw` `bool: false` - 如果启用，log 不会对敏感信息 hash。
+- `hmac_accessor` `(bool: true)` - 如果启用，会对 token 进行 hash。
+- `mode` `(string: "0600")` - 包含了表示文件模式位模式的八进制数的字符串，类似 `chmod`。设置为 `0000` 以防止 Vault 修改文件模式。
+- `format` `(string: "json")` - 允许选择输出格式。有效值是 `json` 和 `jsonx` ，将普通日志条目格式化为 XML。
+- `prefix` `(string: "")` - 在实际日志行之前写入的自定义的字符串前缀。
+
+## Syslog Audit Device
+`syslog` 审计设备将审计日志写入 syslog。
+
+目前不支持可配置的 syslog 目的地，并且总是发送到本地代理。此设备仅在 Unix 系统上受支持，如果任何备用 Vault 实例不支持该设备，则不应启用该设备。
+
+> 某些操作生成的审计消息可能非常大，并且可能比 [maximum-size single UDP packet](https://tools.ietf.org/html/rfc5426#section-3.1) 还要大。
+如果可能，使用的 syslog 守护进程，配置一个 TCP 侦听器。否则，请考虑使用 `file` 后端，并将 `syslog` 配置为从文件中读取条目。或者，
+同时启用 `file` 和 `syslog`，以便特定消息不能直接写入到 `syslog`，不会导致 Vault 被阻塞。
+
+### Examples
+`syslog` 审计设备可以使用下面的命令启用：
+```sh
+$ vault audit enable syslog
+```
+
+通过 `K=V` 对 提供配置参数:
+```sh
+$ vault audit enable syslog tag="vault" facility="AUTH"
+```
+
+### Configuration
+
+- `facility` `(string: "AUTH")` - 要使用的 syslog 工具。
+- `tag` `(string: "vault")` - 要使用的 syslog 标签。
+- `log_raw` `bool: false` - 如果启用，log 不会对敏感信息 hash。
+- `hmac_accessor` `(bool: true)` - 如果启用，会对 token 进行 hash。
+- `mode` `(string: "0600")` - 包含了表示文件模式位模式的八进制数的字符串，类似 `chmod`。设置为 `0000` 以防止 Vault 修改文件模式。
+- `format` `(string: "json")` - 允许选择输出格式。有效值是 `json` 和 `jsonx` ，将普通日志条目格式化为 XML。
+- `prefix` `(string: "")` - 在实际日志行之前写入的自定义的字符串前缀。
+
+## Socket Audit Device
+`socket` 审计设备写入 TCP、UDP 或 UNIX 套接字。
+
+> 由于该设备中使用的底层协议的性质，存在这样一种情况，当到套接字的连接丢失时，日志中可以省略一个审计条目，而请求仍然会成功。
+将此设备与另一个审计设备一起使用将有助于提高准确性，但如果审计日志需要保证，则不应使用套接字设备。
+
+### Enabling
+在默认的路径上启用：
+```sh
+$ vault audit enable socket
+```
+
+通过 `K=V` 对 提供配置参数:
+```sh
+$ vault audit enable socket address=127.0.0.1:9090 socket_type=tcp
+```
+
+### Configuration
+
+- `address` `(string: "")` - 要使用的套接字服务器地址。例 `127.0.0.1:9090` 或 `/tmp/audit.sock`。
+- `socket_type` `(string: "tcp")` - 要使用的套接字类型，可以接受任何与 [net.Dial](https://golang.org/pkg/net/#Dial) 兼容的类型。
+- `log_raw` `bool: false` - 如果启用，log 不会对敏感信息 hash。
+- `hmac_accessor` `(bool: true)` - 如果启用，会对 token 进行 hash。
+- `mode` `(string: "0600")` - 包含了表示文件模式位模式的八进制数的字符串，类似 `chmod`。设置为 `0000` 以防止 Vault 修改文件模式。
+- `format` `(string: "json")` - 允许选择输出格式。有效值是 `json` 和 `jsonx` ，将普通日志条目格式化为 XML。
+- `prefix` `(string: "")` - 在实际日志行之前写入的自定义的字符串前缀。
