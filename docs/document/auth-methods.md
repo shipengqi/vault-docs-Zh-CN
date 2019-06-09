@@ -178,6 +178,81 @@ SecretID 是所有登录（通过 `secret_id`）默认所需的凭证，并且�
 ### API
 AppRole auth 方法有完整的 HTTP API，查看更多 [AppRole API]()详情。
 
+## GitHub Auth Method
+`github` auth 方法使 Vault 可以使用 github GitHub personal access token 进行身份验证。这种身份验证方法对
+直接通过 CLI 使用 Vault 的操作人员或开发人员最有用。
+
+> Vault 不支持生成 GitHub token 的 OAuth 工作流，因此不能当做 GitHub 应用程序。因此，该方法使用 personal access token。一个重要的结果是，
+任何具有 `read:org` 作用域的有效 GitHub 访问令牌都可以用于身份验证。如果这样的令牌从第三方服务中被窃取，并且攻击者能够对 Vault 进行网络调用，那么他们将能够作为
+生成了访问令牌的用户进行登录。使用此方法时，最好确保 Vault 的访问限制在网络级别，而不是公共级别。如果你不能接受这些风险，你应该使用不同的方法。
+
+### Authentication
+#### Via the CLI
+默认路径为 `/github`。如果在不同的路径上启用了此 auth 方法，使用 CLI 指定 `-path=/my-path`。
+```bash
+$ vault login -method=github token="MY_TOKEN"
+```
+
+#### Via the API
+默认端点是 `auth/github/login`。如果在不同的路径上启用了此 auth 方法，请使用该值替换 `kubernetes`。
+```bash
+$ curl \
+    --request POST \
+    --data '{"token": "MY_TOKEN"}' \
+    http://127.0.0.1:8200/v1/auth/github/login
+```
+
+响应中，`token` 在 `auth.client_token` 上：
+```bash
+{
+  "auth": {
+    "renewable": true,
+    "lease_duration": 2764800,
+    "metadata": {
+      "username": "my-user",
+      "org": "my-org"
+    },
+    "policies": [
+      "default",
+      "dev-policy"
+    ],
+    "accessor": "f93c4b2d-18b6-2b50-7a32-0fecf88237b8",
+    "client_token": "1977fceb-3bfa-6c71-4d1f-b64af98ac018"
+  }
+}
+```
+
+### Configuration
+必须事先配置好 Auth 方法，然后才能对用户或计算机进行身份验证。这些步骤通常由操作员或配置管理工具完成。
+
+1. 启用 Github auth 方法：
+```bash
+$ vault auth enable github
+```
+
+2. 通过 `/config` 端点配置 Vault 与 Github 通信。
+```bash
+$ vault write auth/github/config organization=hashicorp
+```
+
+3. 将 GitHub 组织的 users/teams 映射到 Vault 的策略。teams 名称必须是 "slugified"
+```bash
+$ vault write auth/github/map/teams/dev value=dev-policy
+```
+
+在本例中，当组织 "hashicorp" 中的 team"dev" 的成员使用 GitHub personal access token 对 Vault 进行身份验证时，
+将给他们一个附带 `dev-policy` 策略的令牌。
+
+你还可以为指定的用户创建映射，使用 `map/users/<user>` ：
+```sh
+$ vault write auth/github/map/users/sethvargo value=sethvargo-policy
+```
+
+在本例中，除了其他的 team 策略外，还会为 GitHub 用户名为 `sethvargo` 的用户分配 `sethvargo-policy` 策略。
+
+### API
+GitHub auth 方法有完整的 HTTP API，查看更多 [GitHub auth method API]() 详情。
+
 ## Kubernetes Auth Method
 kubernetes auth 方法可以通过 Vault 验证 Kubernetes Service Account Token。
 
@@ -274,7 +349,7 @@ subjects:
 ```
 
 ### API
-Kubernetes Auth Plugin 有完整的 HTTP API，查看更多 [API]()详情。
+Kubernetes Auth Plugin 有完整的 HTTP API，查看更多 [API]() 详情。
 
 
 ## Token Auth Method
@@ -296,3 +371,67 @@ $ vault login token=<token>
 
 ### API
 Token auth 方法有完整的 HTTP API，查看更多 [Token auth method API]() 详情。
+
+## Userpass Auth Method
+`Userpass` auth 方法允许用户使用一个 username 和 password 对 Vault 进行身份验证。
+
+username/password 组合使用 `users/`路径直接配置到 auth 方法。此方法无法从外部源读取用户名和密码。
+
+`Userpass` auth 方法会把所有提交的用户名转化为小写，例如 `Mary` 和 `mary`是相同的条目。
+
+### Authentication
+#### Via the CLI
+```bash
+$ vault login -method=userpass \
+    username=mitchellh \
+    password=foo
+```
+
+#### Via the API
+```bash
+$ curl \
+    --request POST \
+    --data '{"password": "foo"}' \
+    http://127.0.0.1:8200/v1/auth/userpass/login/mitchellh
+```
+
+响应中，`token` 在 `auth.client_token` 上：
+```bash
+{
+  "lease_id": "",
+  "renewable": false,
+  "lease_duration": 0,
+  "data": null,
+  "auth": {
+    "client_token": "c4f280f6-fdb2-18eb-89d3-589e2e834cdb",
+    "policies": [
+      "admins"
+    ],
+    "metadata": {
+      "username": "mitchellh"
+    },
+    "lease_duration": 0,
+    "renewable": false
+  }
+}
+```
+
+### Configuration
+必须事先配置好 Auth 方法，然后才能对用户或计算机进行身份验证。这些步骤通常由操作员或配置管理工具完成。
+
+1. 启用 Userpass auth 方法：
+```bash
+$ vault auth enable userpass
+```
+
+2.  配置允许认证的用户：
+```bash
+$ vault write auth/userpass/users/mitchellh \
+    password=foo \
+    policies=admins
+```
+
+这会创建一个名为 `mitchellh` 的新用户，密码为 `foo` ，该用户将与“管理员”策略相关联。这是唯一必须的配置。
+
+### API
+Userpass  auth 方法有完整的 HTTP API，查看更多 [Userpass auth method API]() 详情。
