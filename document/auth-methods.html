@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Auth 方法 | Vault 中文文档</title>
+    <meta name="description" content="欢迎来到 HashiCorp Vault 介绍指南!本指南是开始使用 Vault 的最佳地点。本指南涵盖了Vault 是什么，它可以解决什么问题，它如何与现有软件进行比较，
+并包含了使用 Vault 的快速入门。">
+    <link rel="icon" href="/vault-docs-Zh-CN/logo.png">
+    
+    <link rel="preload" href="/vault-docs-Zh-CN/assets/css/styles.341f2fd2.css" as="style"><link rel="preload" href="/vault-docs-Zh-CN/assets/js/app.341f2fd2.js" as="script"><link rel="preload" href="/vault-docs-Zh-CN/assets/js/9.0280e8d3.js" as="script"><link rel="prefetch" href="/vault-docs-Zh-CN/assets/css/1.styles.03294af5.css"><link rel="prefetch" href="/vault-docs-Zh-CN/assets/css/3.styles.c23ef979.css"><link rel="prefetch" href="/vault-docs-Zh-CN/assets/js/1.03294af5.js"><link rel="prefetch" href="/vault-docs-Zh-CN/assets/js/10.06280d87.js"><link rel="prefetch" href="/vault-docs-Zh-CN/assets/js/11.bcdf7111.js"><link rel="prefetch" href="/vault-docs-Zh-CN/assets/js/12.237d0fc4.js"><link rel="prefetch" href="/vault-docs-Zh-CN/assets/js/13.68dc0d8d.js"><link rel="prefetch" href="/vault-docs-Zh-CN/assets/js/14.92bdbbbe.js"><link rel="prefetch" href="/vault-docs-Zh-CN/assets/js/15.b2db5799.js"><link rel="prefetch" href="/vault-docs-Zh-CN/assets/js/16.686d05ff.js"><link rel="prefetch" href="/vault-docs-Zh-CN/assets/js/2.1eb2df92.js"><link rel="prefetch" href="/vault-docs-Zh-CN/assets/js/3.c23ef979.js"><link rel="prefetch" href="/vault-docs-Zh-CN/assets/js/4.4470f8cc.js"><link rel="prefetch" href="/vault-docs-Zh-CN/assets/js/5.072add43.js"><link rel="prefetch" href="/vault-docs-Zh-CN/assets/js/6.4dd90ff1.js"><link rel="prefetch" href="/vault-docs-Zh-CN/assets/js/7.4656fea3.js"><link rel="prefetch" href="/vault-docs-Zh-CN/assets/js/8.a0b92025.js">
+    <link rel="stylesheet" href="/vault-docs-Zh-CN/assets/css/1.styles.03294af5.css"><link rel="stylesheet" href="/vault-docs-Zh-CN/assets/css/3.styles.c23ef979.css"><link rel="stylesheet" href="/vault-docs-Zh-CN/assets/css/styles.341f2fd2.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/vault-docs-Zh-CN/" class="home-link router-link-active"><!----> <span class="site-name">Vault 中文文档</span></a> <div class="links" style="max-width:nullpx;"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><div class="nav-item"><a href="/vault-docs-Zh-CN/guide/" class="nav-link">入门指南</a></div><div class="nav-item"><a href="/vault-docs-Zh-CN/document/" class="nav-link router-link-active">文档</a></div><div class="nav-item"><a href="/vault-docs-Zh-CN/api/" class="nav-link">API</a></div> <a href="https://github.com/shipengqi/vault-docs-Zh-CN" target="_blank" rel="noopener noreferrer" class="repo-link">
+    GitHub
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></nav></div></header> <div class="sidebar-mask"></div> <div class="sidebar"><nav class="nav-links"><div class="nav-item"><a href="/vault-docs-Zh-CN/guide/" class="nav-link">入门指南</a></div><div class="nav-item"><a href="/vault-docs-Zh-CN/document/" class="nav-link router-link-active">文档</a></div><div class="nav-item"><a href="/vault-docs-Zh-CN/api/" class="nav-link">API</a></div> <a href="https://github.com/shipengqi/vault-docs-Zh-CN" target="_blank" rel="noopener noreferrer" class="repo-link">
+    GitHub
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></nav>  <ul class="sidebar-links"><li><div class="sidebar-group first collapsable"><p class="sidebar-heading open"><span>文档（持续更新中...）</span> <span class="arrow down"></span></p> <ul class="sidebar-group-items"><li><a href="/vault-docs-Zh-CN/document/" class="sidebar-link">Vault 文档</a></li><li><a href="/vault-docs-Zh-CN/document/installing.html" class="sidebar-link">安装</a></li><li><a href="/vault-docs-Zh-CN/document/internals.html" class="sidebar-link">内部构件</a></li><li><a href="/vault-docs-Zh-CN/document/concepts.html" class="sidebar-link">概念</a></li><li><a href="/vault-docs-Zh-CN/document/configuration.html" class="sidebar-link">配置</a></li><li><a href="/vault-docs-Zh-CN/document/cli.html" class="sidebar-link">CLI</a></li><li><a href="/vault-docs-Zh-CN/document/vault-agent.html" class="sidebar-link">Vault 代理</a></li><li><a href="/vault-docs-Zh-CN/document/secrets-engines.html" class="sidebar-link">Secrets 引擎</a></li><li><a href="/vault-docs-Zh-CN/document/auth-methods.html" class="active sidebar-link">Auth 方法</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/vault-docs-Zh-CN/document/auth-methods.html#enabling-disabling-auth-methods" class="sidebar-link">Enabling/Disabling Auth Methods</a></li><li class="sidebar-sub-header"><a href="/vault-docs-Zh-CN/document/auth-methods.html#approle-auth-method" class="sidebar-link">AppRole Auth Method</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/vault-docs-Zh-CN/document/auth-methods.html#authentication" class="sidebar-link">Authentication</a></li><li class="sidebar-sub-header"><a href="/vault-docs-Zh-CN/document/auth-methods.html#configuration" class="sidebar-link">Configuration</a></li><li class="sidebar-sub-header"><a href="/vault-docs-Zh-CN/document/auth-methods.html#credentials-constraints" class="sidebar-link">Credentials/Constraints</a></li><li class="sidebar-sub-header"><a href="/vault-docs-Zh-CN/document/auth-methods.html#api" class="sidebar-link">API</a></li></ul></li><li class="sidebar-sub-header"><a href="/vault-docs-Zh-CN/document/auth-methods.html#github-auth-method" class="sidebar-link">GitHub Auth Method</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/vault-docs-Zh-CN/document/auth-methods.html#authentication-2" class="sidebar-link">Authentication</a></li><li class="sidebar-sub-header"><a href="/vault-docs-Zh-CN/document/auth-methods.html#configuration-2" class="sidebar-link">Configuration</a></li><li class="sidebar-sub-header"><a href="/vault-docs-Zh-CN/document/auth-methods.html#api-2" class="sidebar-link">API</a></li></ul></li><li class="sidebar-sub-header"><a href="/vault-docs-Zh-CN/document/auth-methods.html#kubernetes-auth-method" class="sidebar-link">Kubernetes Auth Method</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/vault-docs-Zh-CN/document/auth-methods.html#authentication-3" class="sidebar-link">Authentication</a></li><li class="sidebar-sub-header"><a href="/vault-docs-Zh-CN/document/auth-methods.html#configuration-3" class="sidebar-link">Configuration</a></li><li class="sidebar-sub-header"><a href="/vault-docs-Zh-CN/document/auth-methods.html#configuring-kubernetes" class="sidebar-link">Configuring Kubernetes</a></li><li class="sidebar-sub-header"><a href="/vault-docs-Zh-CN/document/auth-methods.html#api-3" class="sidebar-link">API</a></li></ul></li><li class="sidebar-sub-header"><a href="/vault-docs-Zh-CN/document/auth-methods.html#token-auth-method" class="sidebar-link">Token Auth Method</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/vault-docs-Zh-CN/document/auth-methods.html#authentication-4" class="sidebar-link">Authentication</a></li><li class="sidebar-sub-header"><a href="/vault-docs-Zh-CN/document/auth-methods.html#api-4" class="sidebar-link">API</a></li></ul></li><li class="sidebar-sub-header"><a href="/vault-docs-Zh-CN/document/auth-methods.html#userpass-auth-method" class="sidebar-link">Userpass Auth Method</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/vault-docs-Zh-CN/document/auth-methods.html#authentication-5" class="sidebar-link">Authentication</a></li><li class="sidebar-sub-header"><a href="/vault-docs-Zh-CN/document/auth-methods.html#configuration-4" class="sidebar-link">Configuration</a></li><li class="sidebar-sub-header"><a href="/vault-docs-Zh-CN/document/auth-methods.html#api-5" class="sidebar-link">API</a></li></ul></li></ul></li><li><a href="/vault-docs-Zh-CN/document/audit-device.html" class="sidebar-link">Audit Devices</a></li></ul></div></li></ul> </div> <div class="page"> <div class="content"><h1 id="auth-方法"><a href="#auth-方法" aria-hidden="true" class="header-anchor">#</a> Auth 方法</h1> <p>Auth 方法是 Vault 中执行身份验证的组件，负责为用户分配标识和一组策略。</p> <p>通过使用多种身份验证方法，可以使用对你的 Vault 和你的组织的适用的身份验证方法。</p> <p>例如，在开发人员计算机上，<a href>GitHub 身份验证方法</a>最容易使用。 但对于服务器，<a href>AppRole</a> 方法是推荐的选择。</p> <p>要了解有关身份验证的更多信息，请参阅 <a href>authentication concepts page</a>。</p> <h2 id="enabling-disabling-auth-methods"><a href="#enabling-disabling-auth-methods" aria-hidden="true" class="header-anchor">#</a> Enabling/Disabling Auth Methods</h2> <p>可以使用 CLI 或 API 启用或禁用 Auth 方法。</p> <div class="language-bash extra-class"><pre class="language-bash"><code>$ vault auth <span class="token function">enable</span> userpass
+</code></pre></div><p>启用后，auth 方法类似于 <a href>secrets 引擎</a>：它们挂载在 Vault 挂载表中，可以使用标准的 read/write API 进行访问和配置。 所有 auth 方法都挂载在 <code>auth/</code> 前缀下面。</p> <p>默认情况下，auth 方法挂载到 <code>auth/&lt;type&gt;</code>。 例如，如果启用“github”，则可以在 <code>auth/github</code> 上与其进行交互。 但是，此路径是可自定义的，允许具有高级用例的用户多次挂载单个 auth 方法。</p> <div class="language-bash extra-class"><pre class="language-bash"><code>$ vault auth <span class="token function">enable</span> -path<span class="token operator">=</span>my-login userpass
+</code></pre></div><p>禁用 auth 方法后，将通过该方法验证的所有用户自动注销。</p> <h2 id="approle-auth-method"><a href="#approle-auth-method" aria-hidden="true" class="header-anchor">#</a> AppRole Auth Method</h2> <p><code>approle</code> auth 方法允许计算机或应用程序使用 Vault 定义的 <code>roles</code> 进行身份验证。 <code>AppRole</code> 的开放式设计支持各种工作流程和配置，可处理大量应用程序。 此 auth 方法面向自动化工作流程（机器和服务），对人工操作员不太有用。</p> <p>“AppRole”表示一组 Vault 策略和登录约束，必须满足这些约束才能接收带有这些策略的令牌。范围可以根据需要缩小或宽泛。可以为特定计算机创建 AppRole，甚至可以为该计算机上的特定用户创建 AppRole，也可以跨机器创建服务。
+成功登录所需的凭据取决于与凭据关联的 AppRole 上设置的约束。</p> <h3 id="authentication"><a href="#authentication" aria-hidden="true" class="header-anchor">#</a> Authentication</h3> <h4 id="via-the-cli"><a href="#via-the-cli" aria-hidden="true" class="header-anchor">#</a> Via the CLI</h4> <p>默认路径为 <code>/approle</code>。如果在其他路径上启用了此 auth 方法，请改为指定 <code>auth/my-path/login</code>。</p> <div class="language-bash extra-class"><pre class="language-bash"><code>$ vault <span class="token function">write</span> auth/approle/login \
+    role_id<span class="token operator">=</span>db02de05-fa39-4855-059b-67221c5c2f63 \
+    secret_id<span class="token operator">=</span>6a174c20-f6de-a53c-74d2-6018fcceff64
+
+Key                Value
+---                -----
+token              65b74ffd-842c-fd43-1386-f7d7006e520a
+token_accessor     3c29bc22-5c72-11a6-f778-2bc8f48cea0e
+token_duration     20m0s
+token_renewable    <span class="token boolean">true</span>
+token_policies     <span class="token punctuation">[</span>default<span class="token punctuation">]</span>
+</code></pre></div><h4 id="via-the-api"><a href="#via-the-api" aria-hidden="true" class="header-anchor">#</a> Via the API</h4> <p>默认端点是 <code>auth/approle/login</code>。如果在其他路径上启用了此 auth 方法，请使用该值而不是 <code>approle</code>。</p> <div class="language-bash extra-class"><pre class="language-bash"><code>$ <span class="token function">curl</span> \
+    --request POST \
+    --data <span class="token string">'{&quot;role_id&quot;:&quot;988a9df-...&quot;,&quot;secret_id&quot;:&quot;37b74931...&quot;}'</span> \
+    http://127.0.0.1:8200/v1/auth/approle/login
+</code></pre></div><p>响应中，<code>token</code> 在 <code>auth.client_token</code> 上：</p> <div class="language-bash extra-class"><pre class="language-bash"><code><span class="token punctuation">{</span>
+  <span class="token string">&quot;auth&quot;</span><span class="token keyword">:</span> <span class="token punctuation">{</span>
+    <span class="token string">&quot;renewable&quot;</span><span class="token keyword">:</span> true,
+    <span class="token string">&quot;lease_duration&quot;</span><span class="token keyword">:</span> 2764800,
+    <span class="token string">&quot;metadata&quot;</span><span class="token keyword">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>,
+    <span class="token string">&quot;policies&quot;</span><span class="token keyword">:</span> <span class="token punctuation">[</span>
+      <span class="token string">&quot;default&quot;</span>,
+      <span class="token string">&quot;dev-policy&quot;</span>,
+      <span class="token string">&quot;test-policy&quot;</span>
+    <span class="token punctuation">]</span>,
+    <span class="token string">&quot;accessor&quot;</span><span class="token keyword">:</span> <span class="token string">&quot;5d7fb475-07cb-4060-c2de-1ca3fcbf0c56&quot;</span>,
+    <span class="token string">&quot;client_token&quot;</span><span class="token keyword">:</span> <span class="token string">&quot;98a4c7ab-b1fe-361b-ba0b-e307aacfd587&quot;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre></div><h3 id="configuration"><a href="#configuration" aria-hidden="true" class="header-anchor">#</a> Configuration</h3> <p>必须事先配置好 Auth 方法，然后才能对用户或计算机进行身份验证。这些步骤通常由操作员或配置管理工具完成。</p> <h4 id="via-the-cli-2"><a href="#via-the-cli-2" aria-hidden="true" class="header-anchor">#</a> Via the CLI</h4> <ol><li>启用 AppRole auth 方法：</li></ol> <div class="language-bash extra-class"><pre class="language-bash"><code>$ vault auth <span class="token function">enable</span> approle
+</code></pre></div><ol start="2"><li>创建并命名一个 <code>role</code>：</li></ol> <div class="language-bash extra-class"><pre class="language-bash"><code>$ vault <span class="token function">write</span> auth/approle/role/my-role \
+    secret_id_ttl<span class="token operator">=</span>10m \
+    token_num_uses<span class="token operator">=</span>10 \
+    token_ttl<span class="token operator">=</span>20m \
+    token_max_ttl<span class="token operator">=</span>30m \
+    secret_id_num_uses<span class="token operator">=</span>40
+</code></pre></div><p>有关配置选项的完整列表，参阅 API 文档。</p> <ol start="3"><li>获取这个 <code>AppRole</code> 的<code>RoleID</code>：</li></ol> <div class="language-bash extra-class"><pre class="language-bash"><code>$ vault <span class="token function">read</span> auth/approle/role/my-role/role-id
+role_id     db02de05-fa39-4855-059b-67221c5c2f63
+</code></pre></div><ol start="4"><li>获取针对这个 <code>AppRole</code> 颁发的 <code>SecretID</code>：</li></ol> <div class="language-bash extra-class"><pre class="language-bash"><code>$ vault <span class="token function">write</span> -f auth/approle/role/my-role/secret-id
+secret_id               6a174c20-f6de-a53c-74d2-6018fcceff64
+secret_id_accessor      c454f7e5-996e-7230-6074-6ef26b7bcf86
+</code></pre></div><h4 id="via-the-api-2"><a href="#via-the-api-2" aria-hidden="true" class="header-anchor">#</a> Via the API</h4> <ol><li>启用 AppRole auth 方法：</li></ol> <div class="language-bash extra-class"><pre class="language-bash"><code>$ <span class="token function">curl</span> \
+    --header <span class="token string">&quot;X-Vault-Token: ...&quot;</span> \
+    --request POST \
+    --data <span class="token string">'{&quot;type&quot;: &quot;approle&quot;}'</span> \
+    http://127.0.0.1:8200/v1/sys/auth/approle
+</code></pre></div><ol start="2"><li>使用所需的策略集创建 AppRole：</li></ol> <div class="language-bash extra-class"><pre class="language-bash"><code>$ <span class="token function">curl</span> \
+    --header <span class="token string">&quot;X-Vault-Token: ...&quot;</span> \
+    --request POST \
+    --data <span class="token string">'{&quot;policies&quot;: &quot;dev-policy,test-policy&quot;}'</span> \
+    http://127.0.0.1:8200/v1/auth/approle/role/my-role
+</code></pre></div><p>有关配置选项的完整列表，参阅 API 文档。</p> <ol start="3"><li>获取这个 <code>AppRole</code> 的 <code>RoleID</code>：</li></ol> <div class="language-bash extra-class"><pre class="language-bash"><code>$ <span class="token function">curl</span> \
+    --header <span class="token string">&quot;X-Vault-Token: ...&quot;</span> \
+    http://127.0.0.1:8200/v1/auth/approle/role/my-role/role-id
+
+<span class="token punctuation">{</span>
+  <span class="token string">&quot;data&quot;</span><span class="token keyword">:</span> <span class="token punctuation">{</span>
+    <span class="token string">&quot;role_id&quot;</span><span class="token keyword">:</span> <span class="token string">&quot;988a9dfd-ea69-4a53-6cb6-9d6b86474bba&quot;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>		
+</code></pre></div><ol start="4"><li>获取针对这个 <code>AppRole</code> 颁发的 <code>SecretID</code>：</li></ol> <div class="language-bash extra-class"><pre class="language-bash"><code>$ <span class="token function">curl</span> \
+    --header <span class="token string">&quot;X-Vault-Token: ...&quot;</span> \
+    --request POST \
+     http://127.0.0.1:8200/v1/auth/approle/role/my-role/secret-id
+
+<span class="token punctuation">{</span>
+  <span class="token string">&quot;data&quot;</span><span class="token keyword">:</span> <span class="token punctuation">{</span>
+    <span class="token string">&quot;secret_id_accessor&quot;</span><span class="token keyword">:</span> <span class="token string">&quot;45946873-1d96-a9d4-678c-9229f74386a5&quot;</span>,
+    <span class="token string">&quot;secret_id&quot;</span><span class="token keyword">:</span> <span class="token string">&quot;37b74931-c4cd-d49a-9246-ccc62d682a25&quot;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>		 
+</code></pre></div><h3 id="credentials-constraints"><a href="#credentials-constraints" aria-hidden="true" class="header-anchor">#</a> Credentials/Constraints</h3> <h4 id="roleid"><a href="#roleid" aria-hidden="true" class="header-anchor">#</a> RoleID</h4> <p>RoleID 是一个标识符，用于选择评估其他凭据的 AppRole。 使用 AppRole auth 方法的登录端点进行身份验证时，RoleID 始终是必需的参数（通过 <code>role_id</code>）。 默认情况下，RoleID 是唯一的 UUID，
+允许它们作为其他凭据信息的辅助 secrets。但是，可以将它们设置为特定值以匹配客户端的内省信息（例如，客户端的域名）。</p> <h4 id="secretid"><a href="#secretid" aria-hidden="true" class="header-anchor">#</a> SecretID</h4> <p>SecretID 是所有登录（通过 <code>secret_id</code>）默认所需的凭证，并且始终是加密的。（对于高级用法，可以通过 <code>AppRole</code> 的 <code>bind_secret_id</code> 参数禁用 <code>SecretID</code>，允许只知道 <code>RoleID</code> 或者匹配其他设置约束
+的计算机去获取令牌）。通过 <code>role</code> 本身（Pull 模式）或通过特定的自定义值（ Push 模式）生成 128 位纯随机 UUID，可以针对 AppRole 创建 SecretID。与令牌类似，SecretID 具有使用限制，TTL 和过期等属性。</p> <h5 id="pull-and-push-secretid-modes"><a href="#pull-and-push-secretid-modes" aria-hidden="true" class="header-anchor">#</a> Pull And Push SecretID Modes</h5> <p>如果用于登录的 SecretID 是从 AppRole 获取的，则它在 Pull 模式下运行。 如果客户端针对 AppRole 设置“自定义” SecretID，则将其称为推送模式。推模式模仿已弃用的 <code>App-ID</code> auth方法的行为;但是，
+在大多数情况下，Pull 模式是更好的方法。</p> <h4 id="further-constraints"><a href="#further-constraints" aria-hidden="true" class="header-anchor">#</a> Further Constraints</h4> <p><code>role_id</code> 是 <code>login</code> 端点的必需凭据。<code>role_id</code> 指向的 AppRole 将设置约束。这决定了登录所需的其他凭据。<code>bind_secret_id</code> 约束要求在登录端点传递 <code>secret_id</code>。这个 auth方法可以支持更多约束参数，以支持各种应用程序集。 某些约束不需要凭证，但仍然强制执行登录约束。 例如，<code>secret_id_bound_cidrs</code>将仅允许来自属于AppRole上配置的CIDR块的IP地址的登录。</p> <h3 id="api"><a href="#api" aria-hidden="true" class="header-anchor">#</a> API</h3> <p>AppRole auth 方法有完整的 HTTP API，查看更多 <a href>AppRole API</a>详情。</p> <h2 id="github-auth-method"><a href="#github-auth-method" aria-hidden="true" class="header-anchor">#</a> GitHub Auth Method</h2> <p><code>github</code> auth 方法使 Vault 可以使用 github GitHub personal access token 进行身份验证。这种身份验证方法对
+直接通过 CLI 使用 Vault 的操作人员或开发人员最有用。</p> <blockquote><p>Vault 不支持生成 GitHub token 的 OAuth 工作流，因此不能当做 GitHub 应用程序。因此，该方法使用 personal access token。一个重要的结果是，
+任何具有 <code>read:org</code> 作用域的有效 GitHub 访问令牌都可以用于身份验证。如果这样的令牌从第三方服务中被窃取，并且攻击者能够对 Vault 进行网络调用，那么他们将能够作为
+生成了访问令牌的用户进行登录。使用此方法时，最好确保 Vault 的访问限制在网络级别，而不是公共级别。如果你不能接受这些风险，你应该使用不同的方法。</p></blockquote> <h3 id="authentication-2"><a href="#authentication-2" aria-hidden="true" class="header-anchor">#</a> Authentication</h3> <h4 id="via-the-cli-3"><a href="#via-the-cli-3" aria-hidden="true" class="header-anchor">#</a> Via the CLI</h4> <p>默认路径为 <code>/github</code>。如果在不同的路径上启用了此 auth 方法，使用 CLI 指定 <code>-path=/my-path</code>。</p> <div class="language-bash extra-class"><pre class="language-bash"><code>$ vault login -method<span class="token operator">=</span>github token<span class="token operator">=</span><span class="token string">&quot;MY_TOKEN&quot;</span>
+</code></pre></div><h4 id="via-the-api-3"><a href="#via-the-api-3" aria-hidden="true" class="header-anchor">#</a> Via the API</h4> <p>默认端点是 <code>auth/github/login</code>。如果在不同的路径上启用了此 auth 方法，请使用该值替换 <code>kubernetes</code>。</p> <div class="language-bash extra-class"><pre class="language-bash"><code>$ <span class="token function">curl</span> \
+    --request POST \
+    --data <span class="token string">'{&quot;token&quot;: &quot;MY_TOKEN&quot;}'</span> \
+    http://127.0.0.1:8200/v1/auth/github/login
+</code></pre></div><p>响应中，<code>token</code> 在 <code>auth.client_token</code> 上：</p> <div class="language-bash extra-class"><pre class="language-bash"><code><span class="token punctuation">{</span>
+  <span class="token string">&quot;auth&quot;</span><span class="token keyword">:</span> <span class="token punctuation">{</span>
+    <span class="token string">&quot;renewable&quot;</span><span class="token keyword">:</span> true,
+    <span class="token string">&quot;lease_duration&quot;</span><span class="token keyword">:</span> 2764800,
+    <span class="token string">&quot;metadata&quot;</span><span class="token keyword">:</span> <span class="token punctuation">{</span>
+      <span class="token string">&quot;username&quot;</span><span class="token keyword">:</span> <span class="token string">&quot;my-user&quot;</span>,
+      <span class="token string">&quot;org&quot;</span><span class="token keyword">:</span> <span class="token string">&quot;my-org&quot;</span>
+    <span class="token punctuation">}</span>,
+    <span class="token string">&quot;policies&quot;</span><span class="token keyword">:</span> <span class="token punctuation">[</span>
+      <span class="token string">&quot;default&quot;</span>,
+      <span class="token string">&quot;dev-policy&quot;</span>
+    <span class="token punctuation">]</span>,
+    <span class="token string">&quot;accessor&quot;</span><span class="token keyword">:</span> <span class="token string">&quot;f93c4b2d-18b6-2b50-7a32-0fecf88237b8&quot;</span>,
+    <span class="token string">&quot;client_token&quot;</span><span class="token keyword">:</span> <span class="token string">&quot;1977fceb-3bfa-6c71-4d1f-b64af98ac018&quot;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre></div><h3 id="configuration-2"><a href="#configuration-2" aria-hidden="true" class="header-anchor">#</a> Configuration</h3> <p>必须事先配置好 Auth 方法，然后才能对用户或计算机进行身份验证。这些步骤通常由操作员或配置管理工具完成。</p> <ol><li>启用 Github auth 方法：</li></ol> <div class="language-bash extra-class"><pre class="language-bash"><code>$ vault auth <span class="token function">enable</span> github
+</code></pre></div><ol start="2"><li>通过 <code>/config</code> 端点配置 Vault 与 Github 通信。</li></ol> <div class="language-bash extra-class"><pre class="language-bash"><code>$ vault <span class="token function">write</span> auth/github/config organization<span class="token operator">=</span>hashicorp
+</code></pre></div><ol start="3"><li>将 GitHub 组织的 users/teams 映射到 Vault 的策略。teams 名称必须是 &quot;slugified&quot;</li></ol> <div class="language-bash extra-class"><pre class="language-bash"><code>$ vault <span class="token function">write</span> auth/github/map/teams/dev value<span class="token operator">=</span>dev-policy
+</code></pre></div><p>在本例中，当组织 &quot;hashicorp&quot; 中的 team&quot;dev&quot; 的成员使用 GitHub personal access token 对 Vault 进行身份验证时，
+将给他们一个附带 <code>dev-policy</code> 策略的令牌。</p> <p>你还可以为指定的用户创建映射，使用 <code>map/users/&lt;user&gt;</code> ：</p> <div class="language-sh extra-class"><pre class="language-text"><code>$ vault write auth/github/map/users/sethvargo value=sethvargo-policy
+</code></pre></div><p>在本例中，除了其他的 team 策略外，还会为 GitHub 用户名为 <code>sethvargo</code> 的用户分配 <code>sethvargo-policy</code> 策略。</p> <h3 id="api-2"><a href="#api-2" aria-hidden="true" class="header-anchor">#</a> API</h3> <p>GitHub auth 方法有完整的 HTTP API，查看更多 <a href>GitHub auth method API</a> 详情。</p> <h2 id="kubernetes-auth-method"><a href="#kubernetes-auth-method" aria-hidden="true" class="header-anchor">#</a> Kubernetes Auth Method</h2> <p>kubernetes auth 方法可以通过 Vault 验证 Kubernetes Service Account Token。</p> <h3 id="authentication-3"><a href="#authentication-3" aria-hidden="true" class="header-anchor">#</a> Authentication</h3> <h4 id="via-the-cli-4"><a href="#via-the-cli-4" aria-hidden="true" class="header-anchor">#</a> Via the CLI</h4> <p>默认路径为 <code>/kubernetes</code>。如果在不同的路径上启用了此 auth 方法，使用 CLI 指定 <code>-path=/my-path</code>。</p> <div class="language-bash extra-class"><pre class="language-bash"><code>$ vault <span class="token function">write</span> auth/kubernetes/login role<span class="token operator">=</span>demo jwt<span class="token operator">=</span><span class="token punctuation">..</span>.
+</code></pre></div><h4 id="via-the-api-4"><a href="#via-the-api-4" aria-hidden="true" class="header-anchor">#</a> Via the API</h4> <p>默认端点是 <code>auth/kubernetes/login</code>。如果在不同的路径上启用了此 auth 方法，请使用该值替换 <code>kubernetes</code>。</p> <div class="language-bash extra-class"><pre class="language-bash"><code>$ <span class="token function">curl</span> \
+    --request POST \
+    --data <span class="token string">'{&quot;jwt&quot;: &quot;your_service_account_jwt&quot;, &quot;role&quot;: &quot;demo&quot;}'</span> \
+    http://127.0.0.1:8200/v1/auth/kubernetes/login
+</code></pre></div><p>响应中，<code>token</code> 在 <code>auth.client_token</code> 上：</p> <div class="language-bash extra-class"><pre class="language-bash"><code><span class="token punctuation">{</span>
+  <span class="token string">&quot;auth&quot;</span><span class="token keyword">:</span> <span class="token punctuation">{</span>
+    <span class="token string">&quot;client_token&quot;</span><span class="token keyword">:</span> <span class="token string">&quot;38fe9691-e623-7238-f618-c94d4e7bc674&quot;</span>,
+    <span class="token string">&quot;accessor&quot;</span><span class="token keyword">:</span> <span class="token string">&quot;78e87a38-84ed-2692-538f-ca8b9f400ab3&quot;</span>,
+    <span class="token string">&quot;policies&quot;</span><span class="token keyword">:</span> <span class="token punctuation">[</span>
+      <span class="token string">&quot;default&quot;</span>
+    <span class="token punctuation">]</span>,
+    <span class="token string">&quot;metadata&quot;</span><span class="token keyword">:</span> <span class="token punctuation">{</span>
+      <span class="token string">&quot;role&quot;</span><span class="token keyword">:</span> <span class="token string">&quot;demo&quot;</span>,
+      <span class="token string">&quot;service_account_name&quot;</span><span class="token keyword">:</span> <span class="token string">&quot;vault-auth&quot;</span>,
+      <span class="token string">&quot;service_account_namespace&quot;</span><span class="token keyword">:</span> <span class="token string">&quot;default&quot;</span>,
+      <span class="token string">&quot;service_account_secret_name&quot;</span><span class="token keyword">:</span> <span class="token string">&quot;vault-auth-token-pd21c&quot;</span>,
+      <span class="token string">&quot;service_account_uid&quot;</span><span class="token keyword">:</span> <span class="token string">&quot;aa9aa8ff-98d0-11e7-9bb7-0800276d99bf&quot;</span>
+    <span class="token punctuation">}</span>,
+    <span class="token string">&quot;lease_duration&quot;</span><span class="token keyword">:</span> 2764800,
+    <span class="token string">&quot;renewable&quot;</span><span class="token keyword">:</span> <span class="token boolean">true</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre></div><h3 id="configuration-3"><a href="#configuration-3" aria-hidden="true" class="header-anchor">#</a> Configuration</h3> <p>必须事先配置好 Auth 方法，然后才能对用户或计算机进行身份验证。这些步骤通常由操作员或配置管理工具完成。</p> <ol><li>启用 Kubernetes auth 方法：</li></ol> <div class="language-bash extra-class"><pre class="language-bash"><code>$ vault auth <span class="token function">enable</span> kubernetes
+</code></pre></div><ol start="2"><li>通过 <code>/config</code> 端点配置 Vault 与 Kubernetes 通信。有关可用配置选项的列表，参阅 API 文档：</li></ol> <div class="language-bash extra-class"><pre class="language-bash"><code>$ vault <span class="token function">write</span> auth/kubernetes/config \
+    token_reviewer_jwt<span class="token operator">=</span><span class="token string">&quot;reviewer_service_account_jwt&quot;</span> \
+    kubernetes_host<span class="token operator">=</span>https://192.168.99.100:8443 \
+    kubernetes_ca_cert<span class="token operator">=</span>@ca.crt
+</code></pre></div><ol start="3"><li>创建一个指定的 role：</li></ol> <div class="language-bash extra-class"><pre class="language-bash"><code>vault <span class="token function">write</span> auth/kubernetes/role/demo \
+    bound_service_account_names<span class="token operator">=</span>vault-auth \
+    bound_service_account_namespaces<span class="token operator">=</span>default \
+    policies<span class="token operator">=</span>default \
+    ttl<span class="token operator">=</span>1h
+</code></pre></div><p>这个 role 授权 <code>default</code> 命名空间中的 <code>vault-auth</code> service account ，并为其提供 <code>default</code> 策略。</p> <p>有关可用配置选项的列表，参阅 API 文档。</p> <h3 id="configuring-kubernetes"><a href="#configuring-kubernetes" aria-hidden="true" class="header-anchor">#</a> Configuring Kubernetes</h3> <p>这个 auth 方法访问 <a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.10/#tokenreview-v1-authentication-k8s-io" target="_blank" rel="noopener noreferrer">Kubernetes TokenReview API<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a> 来验证所提供的 JWT 仍然有效。</p> <p>Kubernetes 应该使用 <code>--service-account-lookup</code> 来运行。这在 Kubernetes 1.7 中默认为 <code>true</code> ，但是之前的任何版本都应该确保 Kubernetes API 服务器启动时使用了该设置。
+否则，在 Kubernetes 中删除的令牌将不会被正确地撤销，并且将能够对这个 auth 方法进行身份验证。</p> <p>在这个 auth 方法中使用的 Service Accounts 要可以访问 TokenReview API。如果 Kubernetes 配置了使用 RBAC 角色，则应该授予这个 Service Accounts 访问此 API 的权限。
+下面的示例 ClusterRoleBinding 可用于授予这些权限:</p> <div class="language-yaml extra-class"><pre class="language-yaml"><code><span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> rbac.authorization.k8s.io/v1beta1
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> ClusterRoleBinding
+<span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> role<span class="token punctuation">-</span>tokenreview<span class="token punctuation">-</span>binding
+  <span class="token key atrule">namespace</span><span class="token punctuation">:</span> default
+<span class="token key atrule">roleRef</span><span class="token punctuation">:</span>
+  <span class="token key atrule">apiGroup</span><span class="token punctuation">:</span> rbac.authorization.k8s.io
+  <span class="token key atrule">kind</span><span class="token punctuation">:</span> ClusterRole
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> system<span class="token punctuation">:</span>auth<span class="token punctuation">-</span>delegator
+<span class="token key atrule">subjects</span><span class="token punctuation">:</span>
+<span class="token punctuation">-</span> <span class="token key atrule">kind</span><span class="token punctuation">:</span> ServiceAccount
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> vault<span class="token punctuation">-</span>auth
+  <span class="token key atrule">namespace</span><span class="token punctuation">:</span> default
+</code></pre></div><h3 id="api-3"><a href="#api-3" aria-hidden="true" class="header-anchor">#</a> API</h3> <p>Kubernetes Auth Plugin 有完整的 HTTP API，查看更多 <a href>API</a> 详情。</p> <h2 id="token-auth-method"><a href="#token-auth-method" aria-hidden="true" class="header-anchor">#</a> Token Auth Method</h2> <p><code>token</code> 方法是内置的，并且在 <code>/auth/token</code> 路径上自动启用。它允许用户使用令牌进行身份验证，以及创建新令牌、按令牌撤销机密等等。
+当任何其他 auth 方法返回一个身份标识时，Vault core 调用令牌方法为该标识创建一个新的唯一的令牌。</p> <p>令牌存储还可以用来绕过任何其他 auth 方法：你可以直接创建 tokens，也可以对令牌执行各种其他操作，比如更新和撤销。</p> <p>请查看专用于令牌的 <a href>token concepts</a> 页面。</p> <h3 id="authentication-4"><a href="#authentication-4" aria-hidden="true" class="header-anchor">#</a> Authentication</h3> <h4 id="via-the-cli-5"><a href="#via-the-cli-5" aria-hidden="true" class="header-anchor">#</a> Via the CLI</h4> <div class="language-sh extra-class"><pre class="language-text"><code>$ vault login token=&lt;token&gt;
+</code></pre></div><h4 id="via-the-api-5"><a href="#via-the-api-5" aria-hidden="true" class="header-anchor">#</a> Via the API</h4> <p>令牌被直接设置为 HTTP API 的头。报头应该是 <code>X-VAULT-TOKEN: &lt;token&gt;</code> 或 <code>Authorization: Bearer &lt;token&gt;</code>。</p> <h3 id="api-4"><a href="#api-4" aria-hidden="true" class="header-anchor">#</a> API</h3> <p>Token auth 方法有完整的 HTTP API，查看更多 <a href>Token auth method API</a> 详情。</p> <h2 id="userpass-auth-method"><a href="#userpass-auth-method" aria-hidden="true" class="header-anchor">#</a> Userpass Auth Method</h2> <p><code>Userpass</code> auth 方法允许用户使用一个 username 和 password 对 Vault 进行身份验证。</p> <p>username/password 组合使用 <code>users/</code>路径直接配置到 auth 方法。此方法无法从外部源读取用户名和密码。</p> <p><code>Userpass</code> auth 方法会把所有提交的用户名转化为小写，例如 <code>Mary</code> 和 <code>mary</code>是相同的条目。</p> <h3 id="authentication-5"><a href="#authentication-5" aria-hidden="true" class="header-anchor">#</a> Authentication</h3> <h4 id="via-the-cli-6"><a href="#via-the-cli-6" aria-hidden="true" class="header-anchor">#</a> Via the CLI</h4> <div class="language-bash extra-class"><pre class="language-bash"><code>$ vault login -method<span class="token operator">=</span>userpass \
+    username<span class="token operator">=</span>mitchellh \
+    password<span class="token operator">=</span>foo
+</code></pre></div><h4 id="via-the-api-6"><a href="#via-the-api-6" aria-hidden="true" class="header-anchor">#</a> Via the API</h4> <div class="language-bash extra-class"><pre class="language-bash"><code>$ <span class="token function">curl</span> \
+    --request POST \
+    --data <span class="token string">'{&quot;password&quot;: &quot;foo&quot;}'</span> \
+    http://127.0.0.1:8200/v1/auth/userpass/login/mitchellh
+</code></pre></div><p>响应中，<code>token</code> 在 <code>auth.client_token</code> 上：</p> <div class="language-bash extra-class"><pre class="language-bash"><code><span class="token punctuation">{</span>
+  <span class="token string">&quot;lease_id&quot;</span><span class="token keyword">:</span> <span class="token string">&quot;&quot;</span>,
+  <span class="token string">&quot;renewable&quot;</span><span class="token keyword">:</span> false,
+  <span class="token string">&quot;lease_duration&quot;</span><span class="token keyword">:</span> 0,
+  <span class="token string">&quot;data&quot;</span><span class="token keyword">:</span> null,
+  <span class="token string">&quot;auth&quot;</span><span class="token keyword">:</span> <span class="token punctuation">{</span>
+    <span class="token string">&quot;client_token&quot;</span><span class="token keyword">:</span> <span class="token string">&quot;c4f280f6-fdb2-18eb-89d3-589e2e834cdb&quot;</span>,
+    <span class="token string">&quot;policies&quot;</span><span class="token keyword">:</span> <span class="token punctuation">[</span>
+      <span class="token string">&quot;admins&quot;</span>
+    <span class="token punctuation">]</span>,
+    <span class="token string">&quot;metadata&quot;</span><span class="token keyword">:</span> <span class="token punctuation">{</span>
+      <span class="token string">&quot;username&quot;</span><span class="token keyword">:</span> <span class="token string">&quot;mitchellh&quot;</span>
+    <span class="token punctuation">}</span>,
+    <span class="token string">&quot;lease_duration&quot;</span><span class="token keyword">:</span> 0,
+    <span class="token string">&quot;renewable&quot;</span><span class="token keyword">:</span> <span class="token boolean">false</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre></div><h3 id="configuration-4"><a href="#configuration-4" aria-hidden="true" class="header-anchor">#</a> Configuration</h3> <p>必须事先配置好 Auth 方法，然后才能对用户或计算机进行身份验证。这些步骤通常由操作员或配置管理工具完成。</p> <ol><li>启用 Userpass auth 方法：</li></ol> <div class="language-bash extra-class"><pre class="language-bash"><code>$ vault auth <span class="token function">enable</span> userpass
+</code></pre></div><ol start="2"><li>配置允许认证的用户：</li></ol> <div class="language-bash extra-class"><pre class="language-bash"><code>$ vault <span class="token function">write</span> auth/userpass/users/mitchellh \
+    password<span class="token operator">=</span>foo \
+    policies<span class="token operator">=</span>admins
+</code></pre></div><p>这会创建一个名为 <code>mitchellh</code> 的新用户，密码为 <code>foo</code> ，该用户将与“管理员”策略相关联。这是唯一必须的配置。</p> <h3 id="api-5"><a href="#api-5" aria-hidden="true" class="header-anchor">#</a> API</h3> <p>Userpass  auth 方法有完整的 HTTP API，查看更多 <a href>Userpass auth method API</a> 详情。</p></div> <div class="page-edit"><div class="edit-link"><a href="https://github.com/shipengqi/vault-docs-Zh-CN/edit/master/docs/document/auth-methods.md" target="_blank" rel="noopener noreferrer">错别字纠正</a> <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></div> <!----></div> <div class="page-nav"><p class="inner"><span class="prev">
+        ←
+        <a href="/vault-docs-Zh-CN/document/secrets-engines.html" class="prev">
+          Secrets 引擎
+        </a></span> <span class="next"><a href="/vault-docs-Zh-CN/document/audit-device.html">
+          Audit Devices
+        </a>
+        →
+      </span></p></div> </div> <!----></div></div>
+    <script src="/vault-docs-Zh-CN/assets/js/9.0280e8d3.js" defer></script><script src="/vault-docs-Zh-CN/assets/js/app.341f2fd2.js" defer></script>
+  </body>
+</html>
