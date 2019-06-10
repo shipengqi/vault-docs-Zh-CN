@@ -34,6 +34,389 @@ secret 引擎接受一个 `barrier view` 已配置的 vault 物理存储。这�
 
 这是 Vault 中一个重要的安全特性 —— 即使一个恶意的引擎也不能访问任何其他引擎的数据。
 
+## KV Secrets Engine
+### Overview
+`kv` Secrets 引擎用于存储任意的 secrets 到 Vault 配置的物理存储中。此后端可以以两种模式之一运行。它可以是一个通用的 `Key-Value` 存储，存储健值对。
+可以启用版本控制，并为每个 key 存储可配置的版本号。
+
+#### KV Version 1
+当运行 `kv` secret backend 无版本控制时，仅保留 key 的最近写入值。无版本 `kv` 的好处是减少了每个 key 的存储大小，因为不存储额外的元数据或历史记录。
+此外，通过这种方式配置到后端的请求将具有更高的性能，因为对于任何给定的请求，将有更少的存储调用，并且没有锁定。
+
+有关在这种模式下运行的更多信息可以在 [K/V Version 1 Docs]() 中找到。
+
+#### KV Version 2
+当运行 v2 版本的 `kv` 后端时，key 可以保留一定数量可配置的版本。默认为 10 个版本。可以检索旧版本的元数据和数据。此外，可以使用 `Check-and-Set` 操作来避免无意中覆盖数据。
+
+当一个版本被删除时，底层数据并没有被删除，而是被标记为已删除。已删除的版本可以取消删除。要永久删除版本的数据，可以使用 destroy 命令或 API 端点。
+此外，可以通过删除 metadata 命令或 API 端点删除 key 的所有版本和元数据。每个操作都可以采用不同的 ACL'ed，从而限制谁具有软删除、取消删除或完全删除数据的权限。
+
+有关在这种模式下运行的更多信息可以在 [K/V Version 2 Docs]() 中找到。
+
+### KV Secrets Engine - Version 1
+`kv` Secrets 引擎用于存储任意的 secrets 到 Vault 配置的物理存储中。
+
+写入一个 key 到 `kv` 后端会替换旧值;子字段不会合并在一起。
+
+key 名必须始终是字符串。如果直接通过 CLI 编写非字符串值，它们将被转换成字符串。
+
+但是，可以通过编写保存非字符串值的 key/value 对的 JSON 文件传递给 Vault，或使用 HTTP API 进行调用。
+
+这个 secret 引擎支持 ACL 策略中的 `create` 和 `update` 功能之间的区别。
+
+> Path 和 key 名是不会被加密的，只有 key 的值会被加密。不应该将敏感信息存储在 secret 的 path 中。
+
+#### Setup
+启用一个版本为 1 的 `kv` 存储：
+```sh
+vault secrets enable -version=1 kv
+```
+
+#### Usage
+在配置了 secret 引擎并且 用户/机器 具有具有适当权限的 Vault 令牌之后，它可以生成凭证。`kv` secret 引擎允许写入任意的健值对。
+
+1. 写入任意数据：
+```sh
+$ vault kv put kv/my-secret my-value=s3cr3t
+Success! Data written to: kv/my-secret
+```
+
+2. 读取任意数据：
+```sh
+$ vault kv get kv/my-secret
+Key                 Value
+---                 -----
+my-value            s3cr3t
+```
+
+3. 列出所有的 keys：
+```sh
+$ vault kv list kv/
+Keys
+----
+my-secret
+```
+
+4. 删除一个 key：
+```sh
+$ vault kv delete kv/my-secret
+Success! Data deleted (if it existed) at: kv/my-secret
+```
+
+#### TTLs
+和其他 secret 引擎不同， `kv` secret 引擎不强制 TTLs 过期。相反，`lease_duration` 只是为了提示使用者应该多久检查一次新值。
+
+若一个 key 提供了 `ttl`，KV secret 引擎将以此值作为租期:
+```sh
+$ vault kv put kv/my-secret ttl=30m my-value=s3cr3t
+Success! Data written to: kv/my-secret
+```
+即使设置了 `ttl`，secret 引擎也不会自己删除数据。`ttl` 的关键仅仅是建议。
+
+当读取一个带有 `ttl` 的值时，`ttl` 键和刷新间隔都会显示:
+```sh
+$ vault kv get kv/my-secret
+Key                 Value
+---                 -----
+my-value            s3cr3t
+ttl                 30m
+```
+
+### KV Secrets Engine - Version 2
+#### Setup
+一个 v2 版本的 secret 引擎可以使用下面的命令启用：
+```sh
+$ vault secrets enable -version=2 kv
+```
+或者，你可以通过 `kv-v2` 作为 secret 引擎类型:
+```sh
+$ vault secrets enable kv-v2
+```
+
+此外，当运行一个 dev-mode 服务器时，默认情况下在路径 `secret/` 上启用了v2 kv secret 引擎(对于非开发服务器，当前为 v1)。可以在不同的路径上多次禁用、移动或启用它。
+KV secret 引擎的每个实例都是独立且唯一的。
+
+#### Upgrading from Version 1
+现有版本 1 的 `kv` 存储可以通过 CLI 或 API 升级到版本 2，如下所示。这将启动一个升级过程，将现有的 key/value 数据升级为版本化的格式。在此过程中，
+挂载将不可访问。这个过程可能需要很长时间，所以要相应地计划。
+
+一旦升级到版本 2，以前数据可访问的路径不可以再满足。你需要调整用户策略，以添加对 version 2 路径的访问，详细介绍 [the ACL Rules section]()。
+同样，一旦 kv 数据升级到版本 2，用户/应用程序 将需要更新与 kv 数据交互的路径。
+
+现有版本 1 的 `kv` 存储可以通过 CLI 升级到版本 2:
+```sh
+$ vault kv enable-versioning secret/
+Success! Tuned the secrets engine at: secret/
+```
+或者通过 API：
+```sh
+$ cat payload.json
+{
+  "options": {
+      "version": "2"
+  }
+}
+
+$ curl \
+    --header "X-Vault-Token: ..." \
+    --request POST \
+    --data @payload.json \
+    http://127.0.0.1:8200/v1/sys/mounts/secret/tune
+```
+
+#### ACL Rules
+版本 2 kv 存储使用前缀 API，这与版本 1 API不同。在从版本 1 kv 升级之前，应该更改 ACL 规则。此外，版本 2 API 中的不同路径可以采用不同的 ACL'ed。
+
+写入和读取版本的前缀是 `data/` 的路径。适用于 1 kv 版本的策略:
+```
+path "secret/dev/team-1/*" {
+  capabilities = ["create", "update", "read"]
+}
+```
+
+需要改为：
+```
+path "secret/data/dev/team-1/*" {
+  capabilities = ["create", "update", "read"]
+}
+```
+这个后端有不同级别的数据删除。若要授予策略删除 key 最新版本的权限，请:
+```
+path "secret/data/dev/team-1/*" {
+  capabilities = ["delete"]
+}
+```
+
+允许策略删除任何版本的 key:
+```
+path "secret/delete/dev/team-1/*" {
+  capabilities = ["update"]
+}
+```
+
+允许策略取消删除数据:
+```
+path "secret/undelete/dev/team-1/*" {
+  capabilities = ["update"]
+}
+```
+
+允许策略销毁版本:
+```
+path "secret/destroy/dev/team-1/*" {
+  capabilities = ["update"]
+}
+```
+允许策略列出所有的 key:
+```
+path "secret/metadata/dev/team-1/*" {
+  capabilities = ["list"]
+}
+```
+允许策略读取每个版本的元数据:
+```
+path "secret/metadata/dev/team-1/*" {
+  capabilities = ["read"]
+}
+```
+允许策略永久删除 key 的所有版本和元数据:
+```
+path "secret/metadata/dev/team-1/*" {
+  capabilities = ["delete"]
+}
+```
+
+#### Usage
+##### Writing/Reading arbitrary data
+1. 写入任意数据：
+```sh
+$ vault kv put secret/my-secret my-value=s3cr3t
+Key              Value
+---              -----
+created_time     2018-03-30T22:11:48.589157362Z
+deletion_time    n/a
+destroyed        false
+version          1
+```
+
+2. 读取任意数据：
+```sh
+$ vault kv get secret/my-secret
+====== Metadata ======
+Key              Value
+---              -----
+created_time     2018-03-30T22:11:48.589157362Z
+deletion_time    n/a
+destroyed        false
+version          1
+
+====== Data ======
+Key         Value
+---         -----
+my-value    s3cr3t
+```
+
+3. 写入另一个版本，仍然可以访问以前的版本。可以选择传递 `-cas` 标志来执行 `check-and-set` 操作。如果没有设置，那么写操作是允许的。如果设置 `-cas=0`，则仅在 key 不存在的情况下才
+允许写入。如果索引非零，则仅当 key 的当前版本与 `cas` 参数中指定的版本匹配时才允许写入。
+```sh
+$ vault kv put -cas=1 secret/my-secret my-value=new-s3cr3t
+Key              Value
+---              -----
+created_time     2018-03-30T22:18:37.124228658Z
+deletion_time    n/a
+destroyed        false
+version          2
+```
+
+4. 现在读取将返回最新版本的数据:
+```sh
+$ vault kv get secret/my-secret
+====== Metadata ======
+Key              Value
+---              -----
+created_time     2018-03-30T22:18:37.124228658Z
+deletion_time    n/a
+destroyed        false
+version          2
+
+====== Data ======
+Key         Value
+---         -----
+my-value    new-s3cr3t
+```
+
+5. 之前的版本可以通过 `-version` 标志来访问：
+```sh
+$ vault kv get -version=1 secret/my-secret
+====== Metadata ======
+Key              Value
+---              -----
+created_time     2018-03-30T22:16:39.808909557Z
+deletion_time    n/a
+destroyed        false
+version          1
+
+====== Data ======
+Key         Value
+---         -----
+my-value    s3cr3t
+```
+
+##### Deleting and Destroying Data
+当执行标准命令 `vault kv delete` 删除数据时会执行**软删除**。它将把版本标记为已删除，并填充一个 `deletion_time` 时间戳。
+软删除不会从底层存储删除版本数据，这样的话，允许撤销删除版本。命令 `vault kv undelete` 是用来处理版本的撤销删除。当使用 destroy 命令时，底层的版本数据将被删除，
+key 元数据将被标记为已销毁。
+
+只有当 key 的版本数超过 `max-versions` 设置所允许的版本数时，或者当使用 `vault kv destroy` 时，版本的数据才会被永久删除。
+如果超过了 `max-versions` 而清除了某个版本，那么版本元数据也将从 key 中删除。
+
+有关更多信息，参阅下面的命令:
+1. 一个 key 的最新版本可以用 delete 命令删除，删除之前的版本需要 `-versions` 标志:
+```sh
+$ vault kv delete secret/my-secret
+Success! Data deleted (if it existed) at: secret/my-secret
+```
+
+2. 撤销删除版本：
+```sh
+$ vault kv undelete -versions=2 secret/my-secret
+Success! Data written to: secret/undelete/my-secret
+
+$ vault kv get secret/my-secret
+====== Metadata ======
+Key              Value
+---              -----
+created_time     2018-03-30T22:18:37.124228658Z
+deletion_time    n/a
+destroyed        false
+version          2
+
+====== Data ======
+Key         Value
+---         -----
+my-value    new-s3cr3t
+```
+
+3. 销毁一个版本永久删除底层数据:
+```sh
+$ vault kv destroy -versions=2 secret/my-secret
+Success! Data written to: secret/destroy/my-secret
+```
+
+##### Key Metadata
+可以使用 metadata 命令 & API跟 踪所有版本和 key 元数据。删除元数据 key 将导致永久删除该 key 的所有元数据和版本。
+
+有关更多信息，参阅下面的命令:
+1. key 的所有元数据和版本都可以查看:
+```sh
+$ vault kv metadata get secret/my-secret
+======= Metadata =======
+Key                Value
+---                -----
+created_time       2018-03-30T22:16:39.808909557Z
+current_version    2
+max_versions       0
+oldest_version     0
+updated_time       2018-03-30T22:18:37.124228658Z
+
+====== Version 1 ======
+Key              Value
+---              -----
+created_time     2018-03-30T22:16:39.808909557Z
+deletion_time    n/a
+destroyed        false
+
+====== Version 2 ======
+Key              Value
+---              -----
+created_time     2018-03-30T22:18:37.124228658Z
+deletion_time    n/a
+destroyed        true
+```
+
+2. key 的元数据设置可以配置:
+```sh
+$ vault kv metadata put -max-versions 1 secret/my-secret
+Success! Data written to: secret/metadata/my-secret
+```
+
+最大版本的变化适用于下一个写操作:
+```sh
+$ vault kv put secret/my-secret my-value=newer-s3cr3t
+Key              Value
+---              -----
+created_time     2018-03-30T22:41:09.193643571Z
+deletion_time    n/a
+destroyed        false
+version          3
+```
+
+一旦一个 key 的版本数量超过最大版本数，最老的版本就会被清除:
+```sh
+$ vault kv metadata get secret/my-secret
+======= Metadata =======
+Key                Value
+---                -----
+created_time       2018-03-30T22:16:39.808909557Z
+current_version    3
+max_versions       1
+oldest_version     3
+updated_time       2018-03-30T22:41:09.193643571Z
+
+====== Version 3 ======
+Key              Value
+---              -----
+created_time     2018-03-30T22:41:09.193643571Z
+deletion_time    n/a
+destroyed        false
+```
+
+3. 永久删除一个 key 的所有元数据和版本:
+```sh
+$ vault kv metadata delete secret/my-secret
+Success! Data deleted (if it existed) at: secret/metadata/my-secret
+```
+
 ## PKI Secrets Engine
 PKI secrets 引擎生成动态 `X.509` 证书。使用这个 secrets 引擎，服务可以获得证书，而不需要手动生成私钥和 CSR，提交到 CA，并等待验证和签名完成。
 Vault 的内置身份验证和授权机制提供了验证功能。
